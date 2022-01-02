@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "ipylivebash"
+version = "0.0.3"
+description = "Run shell script in Jupyter with live output"
+authors = ["Ben Lau <xbenlau@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+ipywidgets = "^7.6.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+
+[build-system]
+requires = ["jupyter_packaging==0.7.9", "jupyterlab==3.*", "setuptools>=40.8.0", "wheel"]
+build-backend = "setuptools.build_meta"

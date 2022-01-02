@@ -1,0 +1,11 @@
+.livebash-log-view {
+  padding: 0px 2px;
+  overflow-y: auto;
+  font-family: monospace;
+  white-space:pre;
+  line-height: 1.2;
+}
+
+.livebash-log-view-divider {
+  padding: 8px 0px 8px 0px;
+}
