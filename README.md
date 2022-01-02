@@ -72,6 +72,8 @@ Set the height of the output cell
  
 Ask for confirmation before execution
 
+![ask_confirm.png (392×80)](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/ask_confirm.png)
+
 **--notify**
   
 Send a notification when the script finished

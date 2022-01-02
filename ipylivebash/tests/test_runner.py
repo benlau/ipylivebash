@@ -21,7 +21,7 @@ def test_runner_run():
 
 
 def test_runner_run_confirm():
-    runner = Runner("--confirm".split())
+    runner = Runner("--ask-confirm".split())
     runner.run(ECHO_SCRIPT)
 
 
