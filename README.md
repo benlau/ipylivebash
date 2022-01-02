@@ -49,7 +49,7 @@ optional arguments:
 
 ## Options
 
-**--save**
+**--save OUTPUT_FILE**
 
 Save the output to a file. 
 

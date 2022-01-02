@@ -10,6 +10,7 @@ build_package:
 .PHONY: clean
 clean:
 	rm -rf dist
+	rm -rf *.egg-info
 
 .PHONY: try-publish
 try-publish:
