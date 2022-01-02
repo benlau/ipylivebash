@@ -103,7 +103,7 @@ class Runner:
         cancel_button.on_click(cancel)
 
         with output:
-            print("Are you sure want to run this script?")
+            print("Are you sure you want to run this script?")
         display(hbox)
 
     def write_line(self, line):

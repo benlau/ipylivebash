@@ -1,4 +1,4 @@
-# ipylivebash - Run shell script in Jupyter with live output
+# ipylivebash
 
 ipylivebash is a library to run shell script in Jupyter with live output.
 
@@ -53,13 +53,13 @@ optional arguments:
 
 Save the output to a file. 
 
-If the name already exists, it will add a suffix to avoid overriding the original file.
+If the file name already exists, it will add a suffix to avoid overriding the original file.
 
 **--save-timestamp**
 
 Add timestamp to the output file name.
 
-**--line-limit**
+**--line-limit LINE_LIMIT**
 
 If the no. of line output exceed the limit, it may be truncated. 
 It will show the last 5 lines only.
