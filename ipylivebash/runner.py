@@ -58,8 +58,6 @@ class Runner:
         self.parser = parser
         self.log_view = LogView()
         self.line_printed = 0
-        self.bottom_text = []
-        self.bottom_text_max_line_count = 5
         self.is_executed = False
         if self.args.output_file is not None:
             self.log_file = LogFile(
@@ -67,14 +65,15 @@ class Runner:
                 use_timestamp=self.args.use_timestamp
             )
         self.log_view.height = self.args.height
+        self.container = widgets.VBox([self.log_view])
 
     def run(self, script):
+        display(self.container)
         funcs = [
             lambda next: self.confirm_run(next),
             lambda next: self.notify(next),
             lambda next: self.execute(script, next)
         ]
-        display(self.log_view)
         run_chain(funcs)
 
     def confirm_run(self, next):
@@ -98,13 +97,12 @@ class Runner:
                 print("")
                 print("Canceled")
 
-        display(output)
         confirm_button.on_click(confirm)
         cancel_button.on_click(cancel)
+        self.container.children = [output, hbox] + list(self.container.children)
 
         with output:
             print("Are you sure you want to run this script?")
-        display(hbox)
 
     def write_message(self, line):
         self.line_printed = self.line_printed + 1
@@ -118,7 +116,7 @@ class Runner:
         if (self.line_printed >= self.args.line_limit and
                 self.args.line_limit > 0):
             if self.log_view.status_header == "":
-                self.log_view.status_header = "=== Output exceed the max line limitation. Only the latest output will be shown ==="  # noqa
+                self.log_view.status_header = "=== Output exceed the line limitation. Only the latest output will be shown ==="  # noqa
             self.log_view.write_status(line)
         else:
             self.log_view.write_message(line)
