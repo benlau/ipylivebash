@@ -30,8 +30,11 @@ class LogFile:
         self.fd = open(filename, "wt")
         return
 
-    def write_line(self, line):
+    def write_message(self, line):
         self.fd.write(line)
+
+    def close(self):
+        self.fd.close()
 
     @classmethod
     def gen_filename(cls, pattern, suffix=None, use_timestamp=False):

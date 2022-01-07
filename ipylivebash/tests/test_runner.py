@@ -17,7 +17,7 @@ def test_runner_run():
     runner = Runner("")
     runner.log_view = MagicMock()
     runner.run(ECHO_SCRIPT)
-    runner.log_view.write_line.assert_called_once_with("123\n")
+    runner.log_view.write_message.assert_called_once_with("123\n")
 
 
 def test_runner_run_confirm():

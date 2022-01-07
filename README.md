@@ -1,6 +1,7 @@
 # ipylivebash
 
 ipylivebash is a library to run shell script in Jupyter with live output.
+It is designed as a utility to use Jupyter as a DevOps management tool.
 
 **Example**
 

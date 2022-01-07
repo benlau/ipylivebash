@@ -8,6 +8,7 @@ from ._frontend import module_name, module_version
 from .debounce import debounce
 
 UNKNOWN = "unknown"
+STATUS_TEXT_LINE_LIMIT = 5
 
 
 class LogView(DOMWidget):
@@ -20,9 +21,9 @@ class LogView(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
-    lines = Any([]).tag(sync=True)
-    divider_text = Unicode('').tag(sync=True)
-    bottom_text = Any([]).tag(sync=True)
+    messages = Any([]).tag(sync=True)
+    status_header = Unicode('').tag(sync=True)
+    status = Any([]).tag(sync=True)
     height = Int(0).tag(sync=True)
 
     notification_permission_request = Bool(False).tag(sync=True)
@@ -33,19 +34,28 @@ class LogView(DOMWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.submitted_count = 0
-        self.lines_buffer = []
+        self.messages_buffer = []
+        self.status_buffer = []
 
-    def write_line(self, line):
-        self.lines_buffer.append(line)
+    def write_message(self, line):
+        self.messages_buffer.append(line)
+        self.submit()
+
+    def write_status(self, status):
+        self.status_buffer.append(status)
+        if len(self.status_buffer) > STATUS_TEXT_LINE_LIMIT:
+            self.status_buffer = self.status_buffer[1:]
         self.submit()
 
     def flush(self):
-        if len(self.lines_buffer) == 0:
+        if len(self.status_buffer) > 0:
+            self.status = self.status_buffer.copy()
+        if len(self.messages_buffer) == 0:
             return
-        lines = [self.submitted_count] + self.lines_buffer
+        messages = [self.submitted_count] + self.messages_buffer
         self.submitted_count = self.submitted_count + 1
-        self.lines_buffer = []
-        self.lines = lines
+        self.messages_buffer = []
+        self.messages = messages
 
     @debounce(0.1)
     def submit(self):

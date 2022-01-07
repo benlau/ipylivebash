@@ -20,7 +20,7 @@ export class LogViewModel extends DOMWidgetModel {
       lines: [],
       divider_text: '',
       height: 0,
-      bottom_text: [],
+      status: [],
       notification_permission_request: false,
       notification_permission: '',
       notification_message: '',
@@ -41,38 +41,38 @@ export class LogViewModel extends DOMWidgetModel {
 
 export class LogView extends DOMWidgetView {
   views: any = {};
-  bottomText = '';
+  status = '';
 
   render() {
     const container = document.createElement('div');
-    const topTextView = document.createElement('div');
-    const divider = document.createElement('div');
-    const bottomTextView = document.createElement('div');
+    const messageView = document.createElement('div');
+    const statusHeader = document.createElement('div');
+    const statusView = document.createElement('div');
 
     container.classList.add('livebash-log-view-container');
     container.setAttribute('tabIndex', '1');
 
-    divider.classList.add('livebash-log-view-divider');
+    statusHeader.classList.add('livebash-log-view-divider');
 
     this.el.classList.add('livebash-log-view');
     this.el.appendChild(container);
 
-    container.appendChild(topTextView);
-    container.appendChild(divider);
-    container.appendChild(bottomTextView);
+    container.appendChild(messageView);
+    container.appendChild(statusHeader);
+    container.appendChild(statusView);
 
     this.views = {
-      topTextView,
-      divider,
-      bottomTextView,
+      messageView,
+      statusHeader,
+      statusView,
       container,
     };
 
     this.heightChanged();
 
-    this.model.on('change:lines', this.linesChanged, this);
-    this.model.on('change:divider_text', this.dividerTextChanged, this);
-    this.model.on('change:bottom_text', this.bottomTextChanged, this);
+    this.model.on('change:messages', this.messagesChanged, this);
+    this.model.on('change:status_header', this.statusHeaderChanged, this);
+    this.model.on('change:status', this.statusChanged, this);
     this.model.on('change:height', this.heightChanged, this);
     this.model.on(
       'change:notification_permission_request',
@@ -86,22 +86,22 @@ export class LogView extends DOMWidgetView {
     );
   }
 
-  linesChanged() {
-    const value = this.model.get('lines');
-    const lines = value.slice(1);
-    lines.forEach((line: any) => {
+  messagesChanged() {
+    const value = this.model.get('messages');
+    const messages = value.slice(1);
+    messages.forEach((line: any) => {
       const elem = document.createElement('p');
       const text = document.createTextNode(line);
       elem.appendChild(text);
-      this.views.topTextView.appendChild(elem);
+      this.views.messageView.appendChild(elem);
     });
 
     this.scrollToEnd();
   }
 
-  dividerTextChanged() {
-    const value = this.model.get('divider_text');
-    this.views.divider.textContent = value;
+  statusHeaderChanged() {
+    const value = this.model.get('status_header');
+    this.views.statusHeader.textContent = value;
   }
 
   scrollToEnd() {
@@ -109,9 +109,9 @@ export class LogView extends DOMWidgetView {
     this.el.scrollTop = container.scrollHeight;
   }
 
-  bottomTextChanged() {
-    const value = this.model.get('bottom_text');
-    this.views.bottomTextView.textContent = '';
+  statusChanged() {
+    const value = this.model.get('status');
+    this.views.statusView.textContent = '';
 
     value
       .map((line: any) => {
@@ -121,7 +121,7 @@ export class LogView extends DOMWidgetView {
         return item;
       })
       .forEach((item: any) => {
-        this.views.bottomTextView.appendChild(item);
+        this.views.statusView.appendChild(item);
       });
   }
 

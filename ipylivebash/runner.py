@@ -106,10 +106,10 @@ class Runner:
             print("Are you sure you want to run this script?")
         display(hbox)
 
-    def write_line(self, line):
+    def write_message(self, line):
         self.line_printed = self.line_printed + 1
         if self.args.output_file is not None:
-            self.log_file.write_line(line)
+            self.log_file.write_message(line)
 
         if self.args.keep_cell_output is True:
             sys.stdout.write(line)
@@ -117,14 +117,11 @@ class Runner:
 
         if (self.line_printed >= self.args.line_limit and
                 self.args.line_limit > 0):
-            if self.log_view.divider_text == "":
-                self.log_view.divider_text = "=== Output exceed the max line limitation. Only the latest output will be shown ==="  # noqa
-            if len(self.bottom_text) >= self.bottom_text_max_line_count:
-                self.bottom_text = self.bottom_text[1:]
-            self.bottom_text.append(line)
-            self.log_view.bottom_text = self.bottom_text.copy()
+            if self.log_view.status_header == "":
+                self.log_view.status_header = "=== Output exceed the max line limitation. Only the latest output will be shown ==="  # noqa
+            self.log_view.write_status(line)
         else:
-            self.log_view.write_line(line)
+            self.log_view.write_message(line)
 
     def execute(self, script, next):
         if self.is_executed:
@@ -141,10 +138,13 @@ class Runner:
                                    universal_newlines=True,
                                    executable='/bin/bash')
         for line in process.stdout:
-            self.write_line(line)
+            self.write_message(line)
 
         time.sleep(0.1)
         self.log_view.flush()
+
+        if self.args.output_file is not None:
+            self.log_file.close()
 
         if process.wait() != 0:
             raise Exception("Failed!")
@@ -158,7 +158,7 @@ class Runner:
 
         def callback(permission):
             if permission != "granted":
-                self.log_view.write_line(
+                self.log_view.write_message(
                     f"Request notification permission failed: {permission}")
                 return
             next()
