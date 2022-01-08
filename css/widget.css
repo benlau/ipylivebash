@@ -1,13 +1,15 @@
 .livebash-log-view {
   padding: 0px 2px;
-  overflow-y: auto;
   font-family: monospace;
   white-space:pre-wrap;
   line-height: 1.2;
 }
 
+.livebash-log-view-container {
+  overflow-y: auto;
+}
+
 .livebash-log-view p {
-  display: inline-block;
   word-wrap: break-word;
   word-break: break-all;
 }
@@ -16,11 +18,18 @@
   padding: 8px 0px 8px 0px;
 }
 
+.livebash-lds-holder {
+  position: relative;
+  height: auto;
+}
+
 .livebash-lds {
   display: inline-block;
-  position: relative;
-  width: 80px;
+  position: absolute;
+  width: 70px;
   height: 1.2em;
+  right: 1em;
+  top: 0px;
 }
 
 .livebash-lds div {

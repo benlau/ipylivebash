@@ -135,6 +135,7 @@ class Runner:
         if self.is_executed:
             return
         self.is_executed = True
+        self.log_view.running = True
 
         if self.args.output_file is not None:
             self.log_file.open()
@@ -156,6 +157,8 @@ class Runner:
 
         if process.wait() != 0:
             raise Exception("Failed!")
+
+        self.log_view.running = False
 
         next()
 

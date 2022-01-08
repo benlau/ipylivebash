@@ -46,24 +46,30 @@ export class LogView extends DOMWidgetView {
 
   render() {
     const container = document.createElement('div');
+    const content = document.createElement('div');
     const messageView = document.createElement('div');
     const statusHeader = document.createElement('div');
+
     const statusView = document.createElement('div');
+
     const loadingSpinner = document.createElement('div');
 
-    container.classList.add('livebash-log-view-container');
-    container.setAttribute('tabIndex', '1');
-
-    statusHeader.classList.add('livebash-log-view-divider');
-
     this.el.classList.add('livebash-log-view');
+
+    container.classList.add('livebash-log-view-container');
     this.el.appendChild(container);
 
-    container.appendChild(messageView);
-    container.appendChild(statusHeader);
-    container.appendChild(statusView);
-    container.appendChild(loadingSpinner);
     loadingSpinner.innerHTML = '<div></div><div></div><div></div><div></div>';
+    this.el.appendChild(loadingSpinner);
+
+    content.setAttribute('tabIndex', '1');
+    container.appendChild(content);
+
+    content.appendChild(messageView);
+    content.appendChild(statusHeader);
+
+    statusHeader.classList.add('livebash-log-view-divider');
+    content.appendChild(statusView);
 
     this.views = {
       messageView,
