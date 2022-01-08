@@ -77,6 +77,7 @@ export class LogView extends DOMWidgetView {
       statusView,
       container,
       loadingSpinner,
+      content,
     };
 
     this.heightChanged();
@@ -118,8 +119,8 @@ export class LogView extends DOMWidgetView {
   }
 
   scrollToEnd() {
-    const { container } = this.views;
-    this.el.scrollTop = container.scrollHeight;
+    const { container, content } = this.views;
+    container.scrollTop = content.scrollHeight;
   }
 
   statusChanged() {

@@ -71,7 +71,7 @@ class Runner:
         self.grid_box = widgets.GridBox(
             children=[self.container],
             layout=widgets.Layout(
-                width = "100%",
+                width="100%",
                 grid_template_rows='auto',
                 grid_template_columns='100%'
             )
@@ -109,7 +109,8 @@ class Runner:
 
         confirm_button.on_click(confirm)
         cancel_button.on_click(cancel)
-        self.container.children = [output, hbox] + list(self.container.children)
+        self.container.children = [output, hbox] + \
+            list(self.container.children)
 
         with output:
             print("Are you sure you want to run this script?")
@@ -140,25 +141,32 @@ class Runner:
         if self.args.output_file is not None:
             self.log_file.open()
 
-        process = subprocess.Popen(script,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT,
-                                   shell=True,
-                                   universal_newlines=True,
-                                   executable='/bin/bash')
-        for line in process.stdout:
-            self.write_message(line)
+        exception = None
 
-        time.sleep(0.1)
-        self.log_view.flush()
+        try:
+            process = subprocess.Popen(script,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT,
+                                       shell=True,
+                                       universal_newlines=True,
+                                       executable='/bin/bash')
+            for line in process.stdout:
+                self.write_message(line)
+        except Exception as e:
+            exception = e
+        finally:
+            time.sleep(0.1)
+            self.log_view.flush()
+            self.log_view.running = False
 
-        if self.args.output_file is not None:
-            self.log_file.close()
+            if self.args.output_file is not None:
+                self.log_file.close()
+
+        if exception is not None:
+            raise exception
 
         if process.wait() != 0:
             raise Exception("Failed!")
-
-        self.log_view.running = False
 
         next()
 
