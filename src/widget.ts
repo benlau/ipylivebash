@@ -17,10 +17,11 @@ export class LogViewModel extends DOMWidgetModel {
       _view_name: LogViewModel.view_name,
       _view_module: LogViewModel.view_module,
       _view_module_version: LogViewModel.view_module_version,
-      lines: [],
+      messages: [],
       divider_text: '',
       height: 0,
       status: [],
+      running: false,
       notification_permission_request: false,
       notification_permission: '',
       notification_message: '',
@@ -48,6 +49,7 @@ export class LogView extends DOMWidgetView {
     const messageView = document.createElement('div');
     const statusHeader = document.createElement('div');
     const statusView = document.createElement('div');
+    const loadingSpinner = document.createElement('div');
 
     container.classList.add('livebash-log-view-container');
     container.setAttribute('tabIndex', '1');
@@ -60,20 +62,25 @@ export class LogView extends DOMWidgetView {
     container.appendChild(messageView);
     container.appendChild(statusHeader);
     container.appendChild(statusView);
+    container.appendChild(loadingSpinner);
+    loadingSpinner.innerHTML = '<div></div><div></div><div></div><div></div>';
 
     this.views = {
       messageView,
       statusHeader,
       statusView,
       container,
+      loadingSpinner,
     };
 
     this.heightChanged();
+    this.runningChanged();
 
     this.model.on('change:messages', this.messagesChanged, this);
     this.model.on('change:status_header', this.statusHeaderChanged, this);
     this.model.on('change:status', this.statusChanged, this);
     this.model.on('change:height', this.heightChanged, this);
+    this.model.on('change:running', this.runningChanged, this);
     this.model.on(
       'change:notification_permission_request',
       this.onNotificationPermissionRequestChanged,
@@ -164,5 +171,16 @@ export class LogView extends DOMWidgetView {
     new Notification('livebash', {
       body: value,
     });
+  }
+
+  runningChanged() {
+    const value = this.model.get('running');
+    const className = 'livebash-lds';
+
+    if (value) {
+      this.views.loadingSpinner.classList.add(className);
+    } else {
+      this.views.loadingSpinner.classList.remove(className);
+    }
   }
 }

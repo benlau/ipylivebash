@@ -9,3 +9,61 @@
 .livebash-log-view-divider {
   padding: 8px 0px 8px 0px;
 }
+
+.livebash-lds {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 1.2em;
+}
+
+.livebash-lds div {
+  position: absolute;
+  top: 0.2em;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  background: #000;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.livebash-lds div:nth-child(1) {
+  left: 8px;
+  animation: livebash-lds1 0.6s infinite;
+}
+.livebash-lds div:nth-child(2) {
+  left: 8px;
+  animation: livebash-lds2 0.6s infinite;
+}
+.livebash-lds div:nth-child(3) {
+  left: 32px;
+  animation: livebash-lds2 0.6s infinite;
+}
+.livebash-lds div:nth-child(4) {
+  left: 56px;
+  animation: livebash-lds3 0.6s infinite;
+}
+@keyframes livebash-lds1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes livebash-lds3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes livebash-lds2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}

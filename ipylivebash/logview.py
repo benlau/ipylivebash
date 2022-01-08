@@ -25,6 +25,7 @@ class LogView(DOMWidget):
     status_header = Unicode('').tag(sync=True)
     status = Any([]).tag(sync=True)
     height = Int(0).tag(sync=True)
+    running = Bool(False).tag(sync=True)
 
     notification_permission_request = Bool(False).tag(sync=True)
     notification_permission = Unicode(UNKNOWN).tag(sync=True)
