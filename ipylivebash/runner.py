@@ -65,10 +65,20 @@ class Runner:
                 use_timestamp=self.args.use_timestamp
             )
         self.log_view.height = self.args.height
-        self.container = widgets.VBox([self.log_view])
+        self.container = widgets.VBox(
+            [self.log_view]
+        )
+        self.grid_box = widgets.GridBox(
+            children=[self.container],
+            layout=widgets.Layout(
+                width = "100%",
+                grid_template_rows='auto',
+                grid_template_columns='100%'
+            )
+        )
 
     def run(self, script):
-        display(self.container)
+        display(self.grid_box)
         funcs = [
             lambda next: self.confirm_run(next),
             lambda next: self.notify(next),

@@ -2,8 +2,14 @@
   padding: 0px 2px;
   overflow-y: auto;
   font-family: monospace;
-  white-space:pre;
+  white-space:pre-wrap;
   line-height: 1.2;
+}
+
+.livebash-log-view p {
+  display: inline-block;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 
 .livebash-log-view-divider {

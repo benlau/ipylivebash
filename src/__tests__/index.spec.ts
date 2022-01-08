@@ -13,14 +13,14 @@ describe('LogViewModel', () => {
     it('should be createable', () => {
       const model = createTestModel(LogViewModel);
       expect(model).toBeInstanceOf(LogViewModel);
-      expect(model.get('lines')).toEqual([]);
+      expect(model.get('messages')).toEqual([]);
     });
 
     it('should be createable with a value', () => {
-      const state = { lines: [0, 'Foo Bar!'] };
+      const state = { messages: [0, 'Foo Bar!'] };
       const model = createTestModel(LogViewModel, state);
       expect(model).toBeInstanceOf(LogViewModel);
-      expect(model.get('lines')).toEqual([0, 'Foo Bar!']);
+      expect(model.get('messages')).toEqual([0, 'Foo Bar!']);
     });
   });
 });
