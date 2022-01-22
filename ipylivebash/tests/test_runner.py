@@ -50,3 +50,12 @@ def test_execute_script_in_thread():
         time.sleep(0.1)
 
     assert messages == ["123\n"]
+
+
+def test_log():
+    runner = Runner("--save output.txt".split())
+    runner.log_file = MagicMock()
+    runner.run(ECHO_SCRIPT)
+    runner.log_file.open.assert_called_once_with()
+    runner.log_file.write_message.assert_called_once_with("123\n")
+    runner.log_file.close.assert_called_once_with()

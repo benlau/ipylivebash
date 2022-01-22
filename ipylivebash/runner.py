@@ -126,13 +126,14 @@ class Runner:
     def run(self, script):
         display(self.grid_box)
         funcs = [
-            lambda next: self.confirm_run(next),
-            lambda next: self.notify(next),
+            lambda next: self.execute_confirmation(next),
+            lambda next: self.execute_notification(next),
+            lambda next: self.execute_logger(next),
             lambda next: self.execute_script(script, next)
         ]
         run_chain(funcs)
 
-    def confirm_run(self, next):
+    def execute_confirmation(self, next):
         if self.args.ask_confirm is not True:
             next()
             return
@@ -184,9 +185,6 @@ class Runner:
         self.is_executed = True
         self.log_view.running = True
 
-        if self.args.output_file is not None:
-            self.log_file.open()
-
         proxy = execute_script_in_thread(script)
         while True:
             time.sleep(0.1)
@@ -207,15 +205,12 @@ class Runner:
         self.log_view.flush()
         self.log_view.running = False
 
-        if self.args.output_file is not None:
-            self.log_file.close()
-
         if error is not None:
             raise error
 
         next()
 
-    def notify(self, next):
+    def execute_notification(self, next):
         if self.args.send_notification is False:
             next()
             return
@@ -229,3 +224,11 @@ class Runner:
             self.log_view.notification_message = "The script is finished"
 
         self.log_view.request_notification_permission(callback)
+
+    def execute_logger(self, next):
+        if self.args.output_file is not None:
+            self.log_file.open()
+            next()
+            self.log_file.close()
+        else:
+            next()
