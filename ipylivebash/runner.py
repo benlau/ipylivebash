@@ -162,6 +162,11 @@ class Runner:
         with output:
             print("Are you sure you want to run this script?")
 
+    def flush(self):
+        self.log_view.flush()
+        if self.args.output_file is not None:
+            self.log_file.flush()
+
     def write_message(self, line):
         self.line_printed = self.line_printed + 1
         if self.args.output_file is not None:
@@ -185,22 +190,26 @@ class Runner:
         self.is_executed = True
         self.log_view.running = True
 
-        proxy = execute_script_in_thread(script)
-        while True:
-            time.sleep(0.1)
-            proxy.acquire()
-            messages = proxy.messages
-            is_finished = proxy.is_finished
-            error = proxy.error
-            proxy.messages = []
-            proxy.release()
+        try:
+            proxy = execute_script_in_thread(script)
+            while True:
+                time.sleep(0.1)
+                proxy.acquire()
+                messages = proxy.messages
+                is_finished = proxy.is_finished
+                error = proxy.error
+                proxy.messages = []
+                proxy.release()
 
-            if len(messages) > 0:
-                for message in messages:
-                    self.write_message(message)
+                if len(messages) > 0:
+                    for message in messages:
+                        self.write_message(message)
+                    self.flush()
 
-            if is_finished or error is not None:
-                break
+                if is_finished or error is not None:
+                    break
+        except Exception as e:
+            error = e
 
         self.log_view.flush()
         self.log_view.running = False

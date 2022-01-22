@@ -36,6 +36,10 @@ class LogFile:
     def close(self):
         self.fd.close()
 
+    def flush(self):
+        if self.fd is not None:
+            self.fd.flush()
+
     @classmethod
     def gen_filename(cls, pattern, suffix=None, use_timestamp=False):
         if use_timestamp is True:

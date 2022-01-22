@@ -5,7 +5,6 @@ LogView Widget
 from ipywidgets import DOMWidget
 from traitlets import Unicode, Any, Int, Bool
 from ._frontend import module_name, module_version
-from .debounce import debounce
 
 UNKNOWN = "unknown"
 STATUS_TEXT_LINE_LIMIT = 5
@@ -40,13 +39,11 @@ class LogView(DOMWidget):
 
     def write_message(self, line):
         self.messages_buffer.append(line)
-        self.submit()
 
     def write_status(self, status):
         self.status_buffer.append(status)
         if len(self.status_buffer) > STATUS_TEXT_LINE_LIMIT:
             self.status_buffer = self.status_buffer[1:]
-        self.submit()
 
     def flush(self):
         if len(self.status_buffer) > 0:
@@ -57,10 +54,6 @@ class LogView(DOMWidget):
         self.submitted_count = self.submitted_count + 1
         self.messages_buffer = []
         self.messages = messages
-
-    @debounce(0.1)
-    def submit(self):
-        self.flush()
 
     def request_notification_permission(self, callback):
         if self.notification_permission != UNKNOWN:
