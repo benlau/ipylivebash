@@ -4,6 +4,7 @@ import subprocess
 import argparse
 import sys
 import time
+import threading
 from .logview import LogView
 from .logfile import LogFile
 
@@ -15,6 +16,51 @@ def run_script(script):
     """
     runner = Runner("")
     runner.run(script)
+
+
+class RunScriptProxy:
+    def __init__(self):
+        self.mutex = threading.Lock()
+        self.is_finished = False
+        self.error = None
+        self.messages = []
+
+    def acquire(self):
+        self.mutex.acquire()
+
+    def release(self):
+        self.mutex.release()
+
+
+def execute_script_in_thread(script):
+    def worker(proxy, script):
+        try:
+            process = subprocess.Popen(script,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT,
+                                       shell=True,
+                                       universal_newlines=True,
+                                       executable='/bin/bash')
+            for line in process.stdout:
+                proxy.acquire()
+                proxy.messages.append(line)
+                proxy.release()
+        except Exception as e:
+            proxy.acquire()
+            proxy.error = e
+            proxy.release()
+
+        proxy.acquire()
+        if process.wait() != 0:
+            proxy.error = Exception("Failed!")
+
+        proxy.is_finished = True
+        proxy.release()
+
+    proxy = RunScriptProxy()
+    thread = threading.Thread(target=worker, args=(proxy, script))
+    thread.start()
+    return proxy
 
 
 def run_chain(funcs):
@@ -82,7 +128,7 @@ class Runner:
         funcs = [
             lambda next: self.confirm_run(next),
             lambda next: self.notify(next),
-            lambda next: self.execute(script, next)
+            lambda next: self.execute_script(script, next)
         ]
         run_chain(funcs)
 
@@ -132,7 +178,7 @@ class Runner:
         else:
             self.log_view.write_message(line)
 
-    def execute(self, script, next):
+    def execute_script(self, script, next):
         if self.is_executed:
             return
         self.is_executed = True
@@ -141,32 +187,31 @@ class Runner:
         if self.args.output_file is not None:
             self.log_file.open()
 
-        exception = None
-
-        try:
-            process = subprocess.Popen(script,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.STDOUT,
-                                       shell=True,
-                                       universal_newlines=True,
-                                       executable='/bin/bash')
-            for line in process.stdout:
-                self.write_message(line)
-        except Exception as e:
-            exception = e
-        finally:
+        proxy = execute_script_in_thread(script)
+        while True:
             time.sleep(0.1)
-            self.log_view.flush()
-            self.log_view.running = False
+            proxy.acquire()
+            messages = proxy.messages
+            is_finished = proxy.is_finished
+            error = proxy.error
+            proxy.messages = []
+            proxy.release()
 
-            if self.args.output_file is not None:
-                self.log_file.close()
+            if len(messages) > 0:
+                for message in messages:
+                    self.write_message(message)
 
-        if exception is not None:
-            raise exception
+            if is_finished or error is not None:
+                break
 
-        if process.wait() != 0:
-            raise Exception("Failed!")
+        self.log_view.flush()
+        self.log_view.running = False
+
+        if self.args.output_file is not None:
+            self.log_file.close()
+
+        if error is not None:
+            raise error
 
         next()
 

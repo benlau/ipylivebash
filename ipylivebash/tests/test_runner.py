@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
-from ..runner import Runner, run_script
+import time
+from ..runner import Runner, run_script, execute_script_in_thread
 
 ECHO_SCRIPT = "echo 123"
 
@@ -32,3 +33,20 @@ def test_runner_run_notify():
 
 def test_run_script():
     run_script(ECHO_SCRIPT)
+
+
+def test_execute_script_in_thread():
+    proxy = execute_script_in_thread(ECHO_SCRIPT)
+    messages = []
+    while True:
+        proxy.acquire()
+        is_finished = proxy.is_finished
+        if len(proxy.messages) > 0:
+            messages = messages + proxy.messages
+            proxy.messages = []
+        proxy.release()
+        if is_finished:
+            break
+        time.sleep(0.1)
+
+    assert messages == ["123\n"]

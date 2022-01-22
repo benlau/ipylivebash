@@ -1,6 +1,7 @@
 .PHONY: test
 test:
 	poetry run pytest
+	npm run test
 
 .PHONY: build_package
 build_package:
