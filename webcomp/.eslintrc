@@ -1,0 +1,19 @@
+{
+    "root": true,
+    "env": {
+      "jest": true
+    },    
+    "parserOptions": {
+      "sourceType": "module"
+    },  
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["react", "react-hooks"],
+    "extends": [
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "indent": ["error", 4],
+      "@typescript-eslint/explicit-module-boundary-types": 0,
+      "@typescript-eslint/no-explicit-any": 0
+    }
+  }

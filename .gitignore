@@ -63,7 +63,7 @@ instance/
 docs/_build/
 docs/source/_static/embed-bundle.js
 docs/source/_static/embed-bundle.js.map
-
+docs/source/_static/*.txt
 # PyBuilder
 target/
 
@@ -155,3 +155,5 @@ ipylivebash/labextension/*.tgz
 # Packed lab extensions
 ipylivebash/labextension
 examples/log*.txt
+
+src/webcomp.ts

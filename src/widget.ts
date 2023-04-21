@@ -6,6 +6,7 @@ import {
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 import '../css/widget.css';
+import './webcomp';
 
 export class LogViewModel extends DOMWidgetModel {
   defaults() {
@@ -43,42 +44,13 @@ export class LogViewModel extends DOMWidgetModel {
 export class LogView extends DOMWidgetView {
   views: any = {};
   status = '';
+  panel: HTMLElement;
 
   render() {
-    const container = document.createElement('div');
-    const content = document.createElement('div');
-    const messageView = document.createElement('div');
-    const statusHeader = document.createElement('div');
-
-    const statusView = document.createElement('div');
-
-    const loadingSpinner = document.createElement('div');
-
-    this.el.classList.add('livebash-log-view');
-
-    container.classList.add('livebash-log-view-container');
-    this.el.appendChild(container);
-
-    loadingSpinner.innerHTML = '<div></div><div></div><div></div><div></div>';
-    this.el.appendChild(loadingSpinner);
-
-    content.setAttribute('tabIndex', '1');
-    container.appendChild(content);
-
-    content.appendChild(messageView);
-    content.appendChild(statusHeader);
-
-    statusHeader.classList.add('livebash-log-view-divider');
-    content.appendChild(statusView);
-
-    this.views = {
-      messageView,
-      statusHeader,
-      statusView,
-      container,
-      loadingSpinner,
-      content,
-    };
+    const panel = document.createElement('live-bash-panel');
+    this.el.appendChild(panel);
+    this.panel = panel;
+    this.panel.setAttribute('tabIndex', "1");
 
     this.heightChanged();
     this.runningChanged();
@@ -102,53 +74,22 @@ export class LogView extends DOMWidgetView {
 
   messagesChanged() {
     const value = this.model.get('messages');
-    const messages = value.slice(1);
-    messages.forEach((line: any) => {
-      const elem = document.createElement('p');
-      const text = document.createTextNode(line);
-      elem.appendChild(text);
-      this.views.messageView.appendChild(elem);
-    });
-
-    this.scrollToEnd();
+    this.panel.setAttribute('messages', value.join("\n"));
   }
 
   statusHeaderChanged() {
     const value = this.model.get('status_header');
-    this.views.statusHeader.textContent = value;
-  }
-
-  scrollToEnd() {
-    const { container, content } = this.views;
-    container.scrollTop = content.scrollHeight;
+    this.panel.setAttribute('status-header', value);
   }
 
   statusChanged() {
     const value = this.model.get('status');
-    this.views.statusView.textContent = '';
-
-    value
-      .map((line: any) => {
-        const item = document.createElement('div');
-        const text = document.createTextNode(line);
-        item.appendChild(text);
-        return item;
-      })
-      .forEach((item: any) => {
-        this.views.statusView.appendChild(item);
-      });
+    this.panel.setAttribute('status', value.join("\n"));
   }
 
   heightChanged() {
     const value = this.model.get('height');
-    if (value > 0) {
-      const height = `${value * 1.2}em`;
-      const styles = {
-        maxHeight: height,
-        height,
-      };
-      Object.assign(this.views.container.style, styles);
-    }
+    this.panel.setAttribute('height-in-lines', value);
   }
 
   onNotificationPermissionRequestChanged() {
@@ -182,12 +123,6 @@ export class LogView extends DOMWidgetView {
 
   runningChanged() {
     const value = this.model.get('running');
-    const className = 'livebash-lds';
-
-    if (value) {
-      this.views.loadingSpinner.classList.add(className);
-    } else {
-      this.views.loadingSpinner.classList.remove(className);
-    }
+    this.panel.setAttribute('loading-spinner-running', value);
   }
 }
