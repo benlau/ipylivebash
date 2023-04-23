@@ -5,6 +5,7 @@ import {JssProvider, SheetsRegistry } from 'react-jss'
 
 interface Delegate {
     methods?: ReturnType<typeof useLiveBashPanel>["methods"];
+    onReady: () => void;
 }
 
 class SheetsRegistryWrapper {
@@ -22,24 +23,23 @@ class SheetsRegistryWrapper {
 
     add(...args) {
         this.registry.add(...args);
-        this.setStyle(this.registry.toString());
+        this.setStyle(this.toString());
     }
 
     remove(...args) {
         this.registry.remove(...args);
-        this.setStyle(this.registry.toString());
+        this.setStyle(this.toString());
     }
 
     reset(...args) {
         this.registry.reset(...args);
-        this.setStyle(this.registry.toString());
+        this.setStyle(this.toString());
     }
 
     toString() {
-        return this.registry.toString();
+        return this.registry.toString({attached: true});
     }
-
-}
+}  
 
 function useSheetRegistry() {
     const [style, setStyle] = React.useState("");
@@ -58,14 +58,14 @@ function useSheetRegistry() {
 }
 
 interface ControllerProps {
+    shadowRoot: ShadowRoot;
     delegate: Delegate,
-    defaultHeightInLines: string | null,
 }
 
 function Controller(props: ControllerProps) {
     const {
         delegate,
-        defaultHeightInLines
+        shadowRoot
     } = props;
 
     const {
@@ -77,21 +77,26 @@ function Controller(props: ControllerProps) {
 
     const {
         registry,
-        style
+        style,
     } = useSheetRegistry();
 
     React.useEffect(() => {
-        if (defaultHeightInLines !== null) {
-            liveBashPanelMethods.setHeightInLines(
-                parseInt(defaultHeightInLines));
-        }
-    }, [defaultHeightInLines]);
+        delegate.onReady();
+    }, []);
+
+    const onEvent = React.useCallback((event: any) => {
+        shadowRoot.dispatchEvent(new CustomEvent('response', {
+            detail: event,
+            bubbles: true, 
+            composed: true
+        }));
+    }, [shadowRoot]);
 
     return (
         <>
             <style>{style}</style>
             <JssProvider registry={registry}>
-                <LiveBashPanel {...liveBashPanelProps} />
+                <LiveBashPanel {...liveBashPanelProps} onEvent={onEvent}/>
             </JssProvider>
         </>
     )
@@ -107,14 +112,26 @@ class LiveBashPanelElm extends HTMLElement {
         const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.appendChild(mountPoint);
         const root = ReactDOM.createRoot(mountPoint);
-        const delegate: Delegate = {}
-        this.delegate = delegate;
-        const defaultHeightInLines = this.getAttribute("height-in-lines");
+        const delegate = {
+            onReady: () => {
+                console.log("ready");
+                const isRunning = this.getAttribute("is-running") === "true";
+                const heightInLines = parseInt(this.getAttribute("height-in-lines") || "0");
+                const {
+                    methods
+                } = delegate as Delegate;
+
+                methods?.setIsRunning(isRunning);
+                methods?.setHeightInLines(heightInLines);
+            }
+        };
+
+        this.delegate = delegate as Delegate;
 
         root.render(
             <Controller
-                defaultHeightInLines={defaultHeightInLines}
-                delegate={delegate}
+                shadowRoot={shadowRoot}
+                delegate={this.delegate}
             />
         );
     }
@@ -128,22 +145,26 @@ class LiveBashPanelElm extends HTMLElement {
     }
     
     attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+        if (this.delegate === undefined || this.delegate.methods === undefined) {
+            return;
+        }
+
         if (name === "messages") {
             const messages = (newValue as string).split("\n").slice(1);
-            this.delegate.methods?.log(messages.join("\n"));
+            this.delegate.methods.log(messages.join("\n"));
         } else if (name === "status-header") {
-            this.delegate.methods?.setStatusHeader(newValue as string);
+            this.delegate.methods.setStatusHeader(newValue as string);
         } else if (name === "status") {
-            this.delegate.methods?.setStatus((newValue as string).split("\n"));
-        } else if (name === "loading-spinner-running") {
-            this.delegate.methods?.setIsLoadingSpinnerRunning(newValue === "true");
+            this.delegate.methods.setStatus((newValue as string).split("\n"));
+        } else if (name === "is-running") {
+            this.delegate.methods.setIsRunning(newValue === "true");
         } else if (name === "height-in-lines") {
-            this.delegate.methods?.setHeightInLines(parseInt(newValue));
+            this.delegate.methods.setHeightInLines(parseInt(newValue));
         }
     }
 
     static get observedAttributes() {
-        return ["messages", "status-header", "status","loading-spinner-running", "height-in-lines"];
+        return ["messages", "status-header", "status","is-running", "height-in-lines"];
     }
 }
     

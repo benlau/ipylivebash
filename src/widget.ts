@@ -26,6 +26,7 @@ export class LogViewModel extends DOMWidgetModel {
       notification_permission_request: false,
       notification_permission: '',
       notification_message: '',
+      response: '',
     };
   }
 
@@ -41,6 +42,8 @@ export class LogViewModel extends DOMWidgetModel {
   static view_module_version = MODULE_VERSION;
 }
 
+let responseId = 0;
+
 export class LogView extends DOMWidgetView {
   views: any = {};
   status = '';
@@ -51,6 +54,9 @@ export class LogView extends DOMWidgetView {
     this.el.appendChild(panel);
     this.panel = panel;
     this.panel.setAttribute('tabIndex', "1");
+    this.panel.addEventListener('response', (e: any) => {
+      this.onPanelResponse(JSON.stringify(e.detail));
+    });
 
     this.heightChanged();
     this.runningChanged();
@@ -123,6 +129,17 @@ export class LogView extends DOMWidgetView {
 
   runningChanged() {
     const value = this.model.get('running');
-    this.panel.setAttribute('loading-spinner-running', value);
+    this.panel.setAttribute('is-running', value);
+  }
+
+  onPanelResponse(content: string) {
+    const value = {
+      id: responseId++,
+      content,
+    }
+
+    this.model.set('response', JSON.stringify(value));
+    this.model.save_changes();
+    this.touch();
   }
 }

@@ -1,9 +1,11 @@
 import React from 'react';
 import {createUseStyles} from 'react-jss'
 import { LoadingSpinner } from './LoadingSpinner';
+import { Toolbar }  from './Toolbar';
 
 const useStyles = createUseStyles({
     container: {
+
     },
     textViewContainer: {
         "overflow-y": "auto",
@@ -33,13 +35,13 @@ const useStyles = createUseStyles({
             bottom: 8
         }
     }
-});
+}, {name: "LiveBashPanel"});
 
 export function useLiveBashPanel() {
     const [messages, setMessages] = React.useState<string[]>([]);
     const [status, setStatus] = React.useState<string[]>([]);
     const [statusHeader, setStatusHeader] = React.useState<string>("");
-    const [isLoadingSpinnerRunning, setIsLoadingSpinnerRunning] = React.useState<boolean>(false);
+    const [isRunning, setIsRunning] = React.useState<boolean>(false);
     const [heightInLines, setHeightInLines] = React.useState<number>(0);
     const textViewcontainerRef = React.useRef<HTMLDivElement>(null);
     const textViewRef = React.useRef<HTMLDivElement>(null);
@@ -57,20 +59,20 @@ export function useLiveBashPanel() {
         messages,
         status,
         statusHeader,
-        isLoadingSpinnerRunning,
+        isRunning,
         heightInLines,
         textViewcontainerRef,
         textViewRef,
-    }), [messages, status, statusHeader, isLoadingSpinnerRunning, heightInLines, textViewcontainerRef, textViewRef]);
+    }), [messages, status, statusHeader, isRunning, heightInLines, textViewcontainerRef, textViewRef]);
 
     const methods = React.useMemo(() => ({
         log,
         setStatus,
         setStatusHeader,
-        setIsLoadingSpinnerRunning,
+        setIsRunning,
         setMessages,
         setHeightInLines
-    }), [log, setStatus, setStatusHeader, setIsLoadingSpinnerRunning,
+    }), [log, setStatus, setStatusHeader, setIsRunning,
         setMessages, setHeightInLines]);
 
     return React.useMemo(() => ({
@@ -82,17 +84,20 @@ export function useLiveBashPanel() {
     ])
 }
 
-type Props = ReturnType<typeof useLiveBashPanel>["props"];
+type Props = ReturnType<typeof useLiveBashPanel>["props"] & {
+    onEvent?: (event: any) => void,
+};
 
 export function LiveBashPanel(props: Props) {
     const {
         messages,
         status,
         statusHeader,
-        isLoadingSpinnerRunning,
+        isRunning,
         heightInLines,
         textViewcontainerRef,
         textViewRef,
+        onEvent
     } = props;
     const classes = useStyles();
 
@@ -105,10 +110,16 @@ export function LiveBashPanel(props: Props) {
         }
     }, [messages]);
 
+    const onStopClicked = React.useCallback(() => {
+        onEvent?.({
+            type: "requestStop",
+        });
+    }, [onEvent]);
 
     return (
-        <div className={classes.container} >
-            <LoadingSpinner isRunning={isLoadingSpinnerRunning}/>
+        <div className={classes.container}>
+            <Toolbar isRunning={isRunning} onStopClick={onStopClicked}/>
+            <LoadingSpinner isRunning={isRunning}/>
             <div style={{maxHeight}} className={classes.textViewContainer} ref={textViewcontainerRef}>
                 <div className={classes.textView} ref={textViewRef}>
                     <>

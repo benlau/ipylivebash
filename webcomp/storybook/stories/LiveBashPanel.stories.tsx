@@ -35,7 +35,7 @@ LiveBashPanelMessageOnlyStory.args = {
     messages: ["Hello",  "World"],
     statusHeader: "=== Divider ===",
     status: ["Status: OK", "End"],
-    isLoadingSpinnerRunning: false
+    isRunning: false
 }
 
 export const LiveBashPanelMaxHeightStory = (args) => {
@@ -49,7 +49,7 @@ export const LiveBashPanelMaxHeightStory = (args) => {
 LiveBashPanelMaxHeightStory.storyName = "LiveBashPanel(HeightInLines)";
 LiveBashPanelMaxHeightStory.args = {
     messages: Array.from(Array(20).keys()).map((i) => `Message ${i}`),
-    isLoadingSpinnerRunning: false,
+    isRunning: false,
     heightInLines: 10
 }
     
@@ -68,5 +68,5 @@ LiveBashPanelLongMessageStory.args = {
         Array.from(Array(50).keys()).map((i) => `${i}`).join("."),  
         "World"
     ],
-    isLoadingSpinnerRunning: false
+    isRunning: false
 }

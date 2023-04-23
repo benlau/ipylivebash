@@ -5,6 +5,7 @@ import argparse
 import sys
 import time
 import threading
+import json
 from .logview import LogView
 from .logfile import LogFile
 
@@ -35,6 +36,7 @@ class RunScriptProxy:
 def execute_script_in_thread(script):
     def worker(proxy, script):
         try:
+            messages = []
             process = subprocess.Popen(script,
                                        stdout=subprocess.PIPE,
                                        stderr=subprocess.STDOUT,
@@ -43,7 +45,7 @@ def execute_script_in_thread(script):
                                        executable='/bin/bash')
             for line in process.stdout:
                 proxy.acquire()
-                proxy.messages.append(line)
+                messages.append(line)
                 proxy.release()
         except Exception as e:
             proxy.acquire()
@@ -105,6 +107,10 @@ class Runner:
         self.log_view = LogView()
         self.line_printed = 0
         self.is_executed = False
+        
+        self.process = None
+        self.process_finish_messages = [""]
+
         if self.args.output_file is not None:
             self.log_file = LogFile(
                 pattern=self.args.output_file,
@@ -122,6 +128,8 @@ class Runner:
                 grid_template_columns='100%'
             )
         )
+
+        self.log_view.observe(self.on_response, names='response')
 
     def run(self, script):
         display(self.grid_box)
@@ -190,33 +198,38 @@ class Runner:
         self.is_executed = True
         self.log_view.running = True
 
-        try:
-            proxy = execute_script_in_thread(script)
-            while True:
-                time.sleep(0.1)
-                proxy.acquire()
-                messages = proxy.messages
-                is_finished = proxy.is_finished
-                error = proxy.error
-                proxy.messages = []
-                proxy.release()
+        def worker():
+            pending_messages = []
+            last_flush_time = time.time()
+            try:
+                process = subprocess.Popen(script,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT,
+                                        shell=True,
+                                        universal_newlines=True,
+                                        executable='/bin/bash')
+                self.process = process
+                for line in process.stdout:
+                    pending_messages.append(line)
+                    current_time = time.time()
+                    if current_time - last_flush_time > 0.1:
+                        if len(pending_messages) > 0:
+                            for message in pending_messages:
+                                self.write_message(message)
+                            self.flush()
+                        pending_messages = []
+                        last_flush_time = current_time
+            except Exception as e:
+                self.process_finish_messages.append(str(e))
 
-                if len(messages) > 0:
-                    for message in messages:
-                        self.write_message(message)
-                    self.flush()
+            for message in self.process_finish_messages:
+                self.write_message(message)
+            self.flush()
+            self.log_view.running = False
 
-                if is_finished or error is not None:
-                    break
-        except Exception as e:
-            error = e
-
-        self.log_view.flush()
-        self.log_view.running = False
-
-        if error is not None:
-            raise error
-
+        self.process_finish_messages = []
+        thread = threading.Thread(target=worker, args=())
+        thread.start()
         next()
 
     def execute_notification(self, next):
@@ -241,3 +254,10 @@ class Runner:
             self.log_file.close()
         else:
             next()
+
+    def on_response(self, change):
+        response = json.loads(change.new)
+        content = json.loads(response['content'])
+        if content['type'] == 'requestStop':
+            self.process_finish_messages.append("Terminated by user")
+            self.process.terminate()

@@ -4,15 +4,21 @@ const path = require("path");
 
 module.exports = {
   webpackFinal: async config => {
-
-    // Storybook detect the document root by using .git,
-    // but we don't have .git inside a docker image.
-    // Apply the following workaround:
-    // https://darekkay.com/blog/storybook-separate-folder/
     const babelLoaderRule = config.module.rules.find(
       (rule) => rule.test.toString() === /\.(mjs|tsx?|jsx?)$/.toString()
     );
     babelLoaderRule.include = [path.resolve(__dirname, "../..")];
+
+    const svgRule = config.module.rules.find(rule =>
+      "test.svg".match(rule.test)
+    );
+    svgRule.exclude = /\.svg$/;
+
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: "raw-loader",
+      include: [path.resolve(__dirname, "../..")]
+    });
 
     return config;
   },

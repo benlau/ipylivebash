@@ -8,9 +8,7 @@
     "start": "parcel src/index.html",
     "clean": "rm -f dist/*",
     "lint": "eslint . --ext .js --ext .tsx",
-    "lint:fix": "eslint . --ext .tsx --ext .js --fix",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "lint:fix": "eslint . --ext .tsx --ext .js --fix"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.3",

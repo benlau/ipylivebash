@@ -30,6 +30,7 @@ class LogView(DOMWidget):
     notification_permission = Unicode(UNKNOWN).tag(sync=True)
 
     notification_message = Unicode('').tag(sync=True)
+    response = Unicode('').tag(sync=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,3 +67,4 @@ class LogView(DOMWidget):
         self.observe(getvalue, "notification_permission")
         self.notification_permission_request = True
         self.notification_permission_request = False
+
