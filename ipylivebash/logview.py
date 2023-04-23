@@ -4,7 +4,10 @@ LogView Widget
 
 from ipywidgets import DOMWidget
 from traitlets import Unicode, Any, Int, Bool
+import json
 from ._frontend import module_name, module_version
+import string
+import random
 
 UNKNOWN = "unknown"
 STATUS_TEXT_LINE_LIMIT = 5
@@ -25,18 +28,22 @@ class LogView(DOMWidget):
     status = Any([]).tag(sync=True)
     height = Int(0).tag(sync=True)
     running = Bool(False).tag(sync=True)
+    confirmation_required = Bool(False).tag(sync=True)
 
     notification_permission_request = Bool(False).tag(sync=True)
     notification_permission = Unicode(UNKNOWN).tag(sync=True)
 
     notification_message = Unicode('').tag(sync=True)
+    
     response = Unicode('').tag(sync=True)
+    action = Unicode('').tag(sync=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.submitted_count = 0
         self.messages_buffer = []
         self.status_buffer = []
+        self.instance_id = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=8))
 
     def write_message(self, line):
         self.messages_buffer.append(line)
@@ -68,3 +75,10 @@ class LogView(DOMWidget):
         self.notification_permission_request = True
         self.notification_permission_request = False
 
+    def send_action(self, content: str):
+        self.action = ''
+        self.action = json.dumps({
+            "id": self.instance_id + f":{self.submitted_count}",
+            "content": content
+        })
+        self.submitted_count = self.submitted_count + 1

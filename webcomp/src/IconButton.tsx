@@ -37,8 +37,8 @@ export function IconButton(props: {
             ev.stopPropagation();
             props.onClick();
         },
-        [props.onClick]
-    );    
+        [props]
+    );
 
     return (
         <div

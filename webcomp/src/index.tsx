@@ -68,10 +68,18 @@ function Controller(props: ControllerProps) {
         shadowRoot
     } = props;
 
+    const onEvent = React.useCallback((event: any) => {
+        shadowRoot.dispatchEvent(new CustomEvent('response', {
+            detail: event,
+            bubbles: true, 
+            composed: true
+        }));
+    }, [shadowRoot]);
+
     const {
         props: liveBashPanelProps,
         methods: liveBashPanelMethods
-    } = useLiveBashPanel();
+    } = useLiveBashPanel({onEvent});
 
     delegate.methods = liveBashPanelMethods;
 
@@ -82,15 +90,8 @@ function Controller(props: ControllerProps) {
 
     React.useEffect(() => {
         delegate.onReady();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const onEvent = React.useCallback((event: any) => {
-        shadowRoot.dispatchEvent(new CustomEvent('response', {
-            detail: event,
-            bubbles: true, 
-            composed: true
-        }));
-    }, [shadowRoot]);
 
     return (
         <>
@@ -114,15 +115,16 @@ class LiveBashPanelElm extends HTMLElement {
         const root = ReactDOM.createRoot(mountPoint);
         const delegate = {
             onReady: () => {
-                console.log("ready");
                 const isRunning = this.getAttribute("is-running") === "true";
                 const heightInLines = parseInt(this.getAttribute("height-in-lines") || "0");
+                const confirmationRequired = this.getAttribute("confirmation-required");
                 const {
                     methods
                 } = delegate as Delegate;
 
                 methods?.setIsRunning(isRunning);
                 methods?.setHeightInLines(heightInLines);
+                methods?.setConfirmationRequired(confirmationRequired === "true");
             }
         };
 
@@ -160,11 +162,18 @@ class LiveBashPanelElm extends HTMLElement {
             this.delegate.methods.setIsRunning(newValue === "true");
         } else if (name === "height-in-lines") {
             this.delegate.methods.setHeightInLines(parseInt(newValue));
+        } else if (name === "action") {
+            this.delegate.methods.sendAction(newValue);
+        } else if (name === "confirmation-required") {
+            this.delegate.methods.setConfirmationRequired(newValue === "true");
         }
     }
 
     static get observedAttributes() {
-        return ["messages", "status-header", "status","is-running", "height-in-lines"];
+        return ["messages", 
+            "status-header", 
+            "status","is-running", "height-in-lines", 
+            "action", "confirmation-required"];
     }
 }
     

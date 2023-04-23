@@ -4,7 +4,9 @@
       "jest": true
     },    
     "parserOptions": {
-      "sourceType": "module"
+      "ecmaFeatures": {
+        "jsx": true
+      }  
     },  
     "parser": "@typescript-eslint/parser",
     "plugins": ["react", "react-hooks"],
@@ -14,6 +16,8 @@
     "rules": {
       "indent": ["error", 4],
       "@typescript-eslint/explicit-module-boundary-types": 0,
-      "@typescript-eslint/no-explicit-any": 0
+      "@typescript-eslint/no-explicit-any": 0,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "error"
     }
   }

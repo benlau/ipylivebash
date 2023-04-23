@@ -70,3 +70,17 @@ LiveBashPanelLongMessageStory.args = {
     ],
     isRunning: false
 }
+
+export const LiveBashPanelConfirmationStory = (args) => {
+    const {
+        props,
+    } = useLiveBashPanel();
+
+    return <LiveBashPanel {...props} {...args}/>
+}
+
+LiveBashPanelConfirmationStory.storyName = "LiveBashPanel(Confirmation Dialog Visible)";
+LiveBashPanelConfirmationStory.args = {
+    messages: ["Hello",  "World"],
+    confirmationRequired: true
+}

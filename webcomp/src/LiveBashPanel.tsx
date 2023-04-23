@@ -1,11 +1,15 @@
 import React from 'react';
-import {createUseStyles} from 'react-jss'
+import { createUseStyles } from 'react-jss'
 import { LoadingSpinner } from './LoadingSpinner';
 import { Toolbar }  from './Toolbar';
+import { useConfirmationDialog, ConfirmationDialog } from './ConfirmationDialog';
+
+enum ActionType {
+    askRunConfirmation = "askRunConfirmation"
+}
 
 const useStyles = createUseStyles({
     container: {
-
     },
     textViewContainer: {
         "overflow-y": "auto",
@@ -37,14 +41,26 @@ const useStyles = createUseStyles({
     }
 }, {name: "LiveBashPanel"});
 
-export function useLiveBashPanel() {
+interface useLiveBashPanelDefaults {
+    onEvent?: (event: any) => void;
+}
+
+export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
     const [messages, setMessages] = React.useState<string[]>([]);
     const [status, setStatus] = React.useState<string[]>([]);
     const [statusHeader, setStatusHeader] = React.useState<string>("");
     const [isRunning, setIsRunning] = React.useState<boolean>(false);
     const [heightInLines, setHeightInLines] = React.useState<number>(0);
+    const [confirmationRequired, setConfirmationRequired] = React.useState<boolean>(false);
+
     const textViewcontainerRef = React.useRef<HTMLDivElement>(null);
     const textViewRef = React.useRef<HTMLDivElement>(null);
+    const onEvent = defaults?.onEvent;
+
+    const {
+        props: confirmationDialogProps,
+        methods: confirmationDialogMethods
+    } = useConfirmationDialog();
 
     const mutableState = React.useRef({
         messages
@@ -55,6 +71,30 @@ export function useLiveBashPanel() {
         setMessages([...mutableState.current.messages]);
     }, []);
 
+    const askRunConfirmation = React.useCallback(() => {
+        confirmationDialogMethods.show(
+            "Are you sure you want to run this script?",
+            () => {
+                onEvent?.({type: "confirmToRun"});
+            },() => {
+                // do nothing
+            });
+    }, [confirmationDialogMethods, onEvent]);
+
+    const sendAction = React.useCallback((action: string) => {
+        const {
+            content
+        } = JSON.parse(action);
+
+        const {
+            type
+        } = JSON.parse(content);
+
+        if (type === ActionType.askRunConfirmation) {
+            askRunConfirmation();
+        }
+    }, [askRunConfirmation]);
+
     const props = React.useMemo(() => ({
         messages,
         status,
@@ -63,7 +103,13 @@ export function useLiveBashPanel() {
         heightInLines,
         textViewcontainerRef,
         textViewRef,
-    }), [messages, status, statusHeader, isRunning, heightInLines, textViewcontainerRef, textViewRef]);
+        confirmationDialogProps,
+        confirmationRequired,
+        onEvent,
+        askRunConfirmation
+    }), [messages, status, statusHeader, isRunning, 
+        heightInLines, textViewcontainerRef, textViewRef, confirmationDialogProps, onEvent,
+        confirmationRequired, askRunConfirmation]);
 
     const methods = React.useMemo(() => ({
         log,
@@ -71,9 +117,13 @@ export function useLiveBashPanel() {
         setStatusHeader,
         setIsRunning,
         setMessages,
-        setHeightInLines
+        setHeightInLines,
+        askRunConfirmation,
+        sendAction,
+        setConfirmationRequired
     }), [log, setStatus, setStatusHeader, setIsRunning,
-        setMessages, setHeightInLines]);
+        setMessages, setHeightInLines, askRunConfirmation, sendAction
+        , setConfirmationRequired]);
 
     return React.useMemo(() => ({
         props,
@@ -84,9 +134,7 @@ export function useLiveBashPanel() {
     ])
 }
 
-type Props = ReturnType<typeof useLiveBashPanel>["props"] & {
-    onEvent?: (event: any) => void,
-};
+type Props = ReturnType<typeof useLiveBashPanel>["props"]
 
 export function LiveBashPanel(props: Props) {
     const {
@@ -97,7 +145,10 @@ export function LiveBashPanel(props: Props) {
         heightInLines,
         textViewcontainerRef,
         textViewRef,
-        onEvent
+        onEvent,
+        confirmationDialogProps,
+        confirmationRequired,
+        askRunConfirmation
     } = props;
     const classes = useStyles();
 
@@ -108,17 +159,26 @@ export function LiveBashPanel(props: Props) {
         if (textViewcontainerRef.current && textViewRef.current) {
             textViewcontainerRef.current.scrollTop = textViewRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, textViewRef, textViewcontainerRef]);
+
+    React.useEffect(() => {
+        if (!confirmationRequired) {
+            return;
+        }
+        askRunConfirmation();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [confirmationRequired]);
 
     const onStopClicked = React.useCallback(() => {
         onEvent?.({
-            type: "requestStop",
+            type: "requestToStop",
         });
     }, [onEvent]);
 
     return (
         <div className={classes.container}>
             <Toolbar isRunning={isRunning} onStopClick={onStopClicked}/>
+            <ConfirmationDialog {...confirmationDialogProps}/>
             <LoadingSpinner isRunning={isRunning}/>
             <div style={{maxHeight}} className={classes.textViewContainer} ref={textViewcontainerRef}>
                 <div className={classes.textView} ref={textViewRef}>

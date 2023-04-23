@@ -110,7 +110,7 @@ class Runner:
         
         self.process = None
         self.process_finish_messages = [""]
-
+        
         if self.args.output_file is not None:
             self.log_file = LogFile(
                 pattern=self.args.output_file,
@@ -132,12 +132,19 @@ class Runner:
         self.log_view.observe(self.on_response, names='response')
 
     def run(self, script):
+        self.script = script
         display(self.grid_box)
         funcs = [
             lambda next: self.execute_confirmation(next),
+            lambda next: self.run_without_confirmation(),
+        ]
+        run_chain(funcs)
+
+    def run_without_confirmation(self):
+        funcs = [
             lambda next: self.execute_notification(next),
             lambda next: self.execute_logger(next),
-            lambda next: self.execute_script(script, next)
+            lambda next: self.execute_script(self.script, next)
         ]
         run_chain(funcs)
 
@@ -146,29 +153,7 @@ class Runner:
             next()
             return
 
-        confirm_button = widgets.Button(description="Confirm")
-        cancel_button = widgets.Button(description="Cancel")
-        output = widgets.Output()
-        hbox = widgets.HBox([confirm_button, cancel_button])
-
-        def confirm(_):
-            hbox.layout.display = 'none'
-            output.layout.display = 'none'
-            next()
-
-        def cancel(_):
-            hbox.layout.display = 'none'
-            with output:
-                print("")
-                print("Canceled")
-
-        confirm_button.on_click(confirm)
-        cancel_button.on_click(cancel)
-        self.container.children = [output, hbox] + \
-            list(self.container.children)
-
-        with output:
-            print("Are you sure you want to run this script?")
+        self.log_view.confirmation_required = True
 
     def flush(self):
         self.log_view.flush()
@@ -258,6 +243,8 @@ class Runner:
     def on_response(self, change):
         response = json.loads(change.new)
         content = json.loads(response['content'])
-        if content['type'] == 'requestStop':
+        if content['type'] == 'requestToStop':
             self.process_finish_messages.append("Terminated by user")
             self.process.terminate()
+        elif content['type'] == 'confirmToRun':
+            self.run_without_confirmation()

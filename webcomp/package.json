@@ -7,8 +7,8 @@
     "build": "parcel build src/index.html  --no-content-hash",
     "start": "parcel src/index.html",
     "clean": "rm -f dist/*",
-    "lint": "eslint . --ext .js --ext .tsx",
-    "lint:fix": "eslint . --ext .tsx --ext .js --fix"
+    "lint": "eslint . --ext .ts --ext .tsx",
+    "lint:fix": "eslint . --ext .tsx --ext .ts --fix"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.3",

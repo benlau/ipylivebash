@@ -27,6 +27,8 @@ export class LogViewModel extends DOMWidgetModel {
       notification_permission: '',
       notification_message: '',
       response: '',
+      action: '',
+      confirmation_required: false
     };
   }
 
@@ -60,6 +62,7 @@ export class LogView extends DOMWidgetView {
 
     this.heightChanged();
     this.runningChanged();
+    this.onConfirmationRequiredChanged();
 
     this.model.on('change:messages', this.messagesChanged, this);
     this.model.on('change:status_header', this.statusHeaderChanged, this);
@@ -76,6 +79,15 @@ export class LogView extends DOMWidgetView {
       this.onNotificationMessageChanged,
       this
     );
+    this.model.on(
+      'change:action',
+      this.onActionChanged,
+      this
+    )
+    this.model.on(
+      'change:confirmation_required',
+      this.onConfirmationRequiredChanged,
+      this)
   }
 
   messagesChanged() {
@@ -141,5 +153,15 @@ export class LogView extends DOMWidgetView {
     this.model.set('response', JSON.stringify(value));
     this.model.save_changes();
     this.touch();
+  }
+
+  onConfirmationRequiredChanged() {
+    const value = this.model.get('confirmation_required');
+    this.panel.setAttribute('confirmation-required', value);
+  }
+
+  onActionChanged() {
+    const value = this.model.get('action');
+    this.panel.setAttribute('action', value);
   }
 }
