@@ -1,6 +1,5 @@
 import { Toolbar } from '../../src/Toolbar';
 import React from 'react';
-import stopIcon from "../../src/assets/stop-solid.svg";
 
 export default {
     title: 'Toolbar',
@@ -17,9 +16,7 @@ export const ToolbarStory = (args) => {
     }
 
     return (
-        <Toolbar onStopClick={onClick} {...args} 
-            icon={stopIcon}>
-        </Toolbar>
+        <Toolbar onStopClick={onClick} onPlayClick={onClick} {...args} />
     );
 }
 

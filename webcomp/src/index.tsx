@@ -152,8 +152,8 @@ class LiveBashPanelElm extends HTMLElement {
         }
 
         if (name === "messages") {
-            const messages = (newValue as string).split("\n").slice(1);
-            this.delegate.methods.log(messages.join("\n"));
+            const messages = newValue;
+            this.delegate.methods.log(messages.split("\n").slice(1).join("\n"));
         } else if (name === "status-header") {
             this.delegate.methods.setStatusHeader(newValue as string);
         } else if (name === "status") {

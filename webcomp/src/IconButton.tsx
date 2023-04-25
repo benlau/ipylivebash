@@ -18,12 +18,17 @@ const useStyles = createUseStyles({
         "&:active": {
             backgroundColor: "#ffe7e77f",
             color: "#a4262c"
+        },
+        "&[disabled]": {
+            pointerEvents: "none",
+            opacity: 0.5,
         }
     },
 }, {name: "IconButton"});
 
 export function IconButton(props: {
     icon: any;
+    isDisabled?: boolean;
     onClick: () => void;
 }) {
     const classes = useStyles();
@@ -34,6 +39,9 @@ export function IconButton(props: {
 
     const callback = React.useCallback(
         (ev: React.MouseEvent<HTMLDivElement>) => {
+            if (props.isDisabled) {
+                return;
+            }
             ev.stopPropagation();
             props.onClick();
         },
@@ -44,6 +52,7 @@ export function IconButton(props: {
         <div
             className={classes.container}
             onClick={callback}
+            disabled={props.isDisabled ?? false}
         >
             <img src={src} alt="" width={12} height={12} />
         </div>

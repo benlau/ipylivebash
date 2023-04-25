@@ -17,7 +17,7 @@ export const IconButtonStory = (args) => {
     }
 
     return (
-        <IconButton onClick={onClick} {...args} 
+        <IconButton onClick={onClick} {...args}
             icon={stopIcon}>
         </IconButton>
     );
@@ -25,5 +25,6 @@ export const IconButtonStory = (args) => {
 
 IconButtonStory.storyName = "IconButton";
 IconButtonStory.args = {
+    isDisabled: false
 }
 

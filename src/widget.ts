@@ -92,7 +92,13 @@ export class LogView extends DOMWidgetView {
 
   messagesChanged() {
     const value = this.model.get('messages');
-    this.panel.setAttribute('messages', value.join("\n"));
+    this.panel.setAttribute('messages', 
+      value.map((v: string) => 
+      {
+        const str = Number.isInteger(v) ? v.toString() : v;
+        return str.replace(/^\s+|\s+$/gm, '')}
+      ).join("\n")
+    );
   }
 
   statusHeaderChanged() {

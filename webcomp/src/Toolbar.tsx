@@ -26,11 +26,7 @@ export function Toolbar(props: Props) {
 
     return (
         <div className={classes.container}>
-            {
-                isRunning && (
-                    <IconButton icon={stopIcon} onClick={onStopClick} />
-                )
-            }
+            <IconButton icon={stopIcon} onClick={onStopClick} isDisabled={!isRunning}/>
         </div>
     )
 }

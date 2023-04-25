@@ -45,6 +45,9 @@ class LogView(DOMWidget):
         self.status_buffer = []
         self.instance_id = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=8))
 
+    def __repr__(self):
+        return f""
+
     def write_message(self, line):
         self.messages_buffer.append(line)
 
@@ -62,6 +65,12 @@ class LogView(DOMWidget):
         self.submitted_count = self.submitted_count + 1
         self.messages_buffer = []
         self.messages = messages
+
+    def clear(self):
+        self.messages = []
+        self.status = []
+        self.status_header = ""
+        self.submitted_count = 0
 
     def request_notification_permission(self, callback):
         if self.notification_permission != UNKNOWN:

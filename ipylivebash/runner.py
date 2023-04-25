@@ -19,52 +19,6 @@ def run_script(script):
     runner.run(script)
 
 
-class RunScriptProxy:
-    def __init__(self):
-        self.mutex = threading.Lock()
-        self.is_finished = False
-        self.error = None
-        self.messages = []
-
-    def acquire(self):
-        self.mutex.acquire()
-
-    def release(self):
-        self.mutex.release()
-
-
-def execute_script_in_thread(script):
-    def worker(proxy, script):
-        try:
-            messages = []
-            process = subprocess.Popen(script,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.STDOUT,
-                                       shell=True,
-                                       universal_newlines=True,
-                                       executable='/bin/bash')
-            for line in process.stdout:
-                proxy.acquire()
-                messages.append(line)
-                proxy.release()
-        except Exception as e:
-            proxy.acquire()
-            proxy.error = e
-            proxy.release()
-
-        proxy.acquire()
-        if process.wait() != 0:
-            proxy.error = Exception("Failed!")
-
-        proxy.is_finished = True
-        proxy.release()
-
-    proxy = RunScriptProxy()
-    thread = threading.Thread(target=worker, args=(proxy, script))
-    thread.start()
-    return proxy
-
-
 def run_chain(funcs):
     if len(funcs) == 0:
         return
@@ -117,26 +71,14 @@ class Runner:
                 use_timestamp=self.args.use_timestamp
             )
         self.log_view.height = self.args.height
-        self.container = widgets.VBox(
-            [self.log_view]
-        )
-        self.grid_box = widgets.GridBox(
-            children=[self.container],
-            layout=widgets.Layout(
-                width="100%",
-                grid_template_rows='auto',
-                grid_template_columns='100%'
-            )
-        )
-
         self.log_view.observe(self.on_response, names='response')
 
     def run(self, script):
         self.script = script
-        display(self.grid_box)
+        display(self.log_view)
         funcs = [
             lambda next: self.execute_confirmation(next),
-            lambda next: self.run_without_confirmation(),
+            lambda _: self.run_without_confirmation(),
         ]
         run_chain(funcs)
 
@@ -180,13 +122,19 @@ class Runner:
     def execute_script(self, script, next):
         if self.is_executed:
             return
+        self.log_view.clear()
         self.is_executed = True
         self.log_view.running = True
+        self.line_printed = 0
+        self.process_finish_messages = []
 
         def worker():
             pending_messages = []
             last_flush_time = time.time()
             try:
+                # Pause a while to make sure the frontend 
+                # could receive the property changes
+                time.sleep(0.1)
                 process = subprocess.Popen(script,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT,
@@ -207,12 +155,18 @@ class Runner:
             except Exception as e:
                 self.process_finish_messages.append(str(e))
 
+            for message in pending_messages:
+                self.write_message(message)
+
             for message in self.process_finish_messages:
                 self.write_message(message)
+
+            self.write_message(f"Process finished with exit code {process.poll()}")
             self.flush()
+
+            self.is_executed = False
             self.log_view.running = False
 
-        self.process_finish_messages = []
         thread = threading.Thread(target=worker, args=())
         thread.start()
         next()
@@ -244,7 +198,7 @@ class Runner:
         response = json.loads(change.new)
         content = json.loads(response['content'])
         if content['type'] == 'requestToStop':
-            self.process_finish_messages.append("Terminated by user")
+            self.process_finish_messages.append("Force terminated")
             self.process.terminate()
         elif content['type'] == 'confirmToRun':
             self.run_without_confirmation()

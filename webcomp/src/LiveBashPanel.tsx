@@ -71,15 +71,23 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
         setMessages([...mutableState.current.messages]);
     }, []);
 
+    const clear = React.useCallback(() => {
+        mutableState.current.messages = [];
+        setMessages([]);
+        setStatusHeader("");
+        setStatus([]);
+    }, [mutableState, setMessages, setStatusHeader, setStatus]);
+
     const askRunConfirmation = React.useCallback(() => {
         confirmationDialogMethods.show(
             "Are you sure you want to run this script?",
             () => {
+                clear();
                 onEvent?.({type: "confirmToRun"});
             },() => {
                 // do nothing
             });
-    }, [confirmationDialogMethods, onEvent]);
+    }, [confirmationDialogMethods, onEvent, clear]);
 
     const sendAction = React.useCallback((action: string) => {
         const {
@@ -106,10 +114,12 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
         confirmationDialogProps,
         confirmationRequired,
         onEvent,
-        askRunConfirmation
+        askRunConfirmation,
+        clear
     }), [messages, status, statusHeader, isRunning, 
-        heightInLines, textViewcontainerRef, textViewRef, confirmationDialogProps, onEvent,
-        confirmationRequired, askRunConfirmation]);
+        heightInLines, textViewcontainerRef, textViewRef, 
+        confirmationDialogProps, onEvent,
+        confirmationRequired, askRunConfirmation, clear]);
 
     const methods = React.useMemo(() => ({
         log,
@@ -120,10 +130,11 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
         setHeightInLines,
         askRunConfirmation,
         sendAction,
-        setConfirmationRequired
+        setConfirmationRequired,
+        clear
     }), [log, setStatus, setStatusHeader, setIsRunning,
         setMessages, setHeightInLines, askRunConfirmation, sendAction
-        , setConfirmationRequired]);
+        , setConfirmationRequired, clear]);
 
     return React.useMemo(() => ({
         props,
@@ -148,7 +159,7 @@ export function LiveBashPanel(props: Props) {
         onEvent,
         confirmationDialogProps,
         confirmationRequired,
-        askRunConfirmation
+        askRunConfirmation,
     } = props;
     const classes = useStyles();
 
