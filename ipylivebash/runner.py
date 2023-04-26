@@ -60,7 +60,7 @@ class Runner:
         self.log_view = LogView()
         self.line_printed = 0
         self.is_executed = False
-        
+
         self.process = None
         self.process_finish_messages = [""]
         
@@ -129,9 +129,14 @@ class Runner:
         self.line_printed = 0
         self.process_finish_messages = []
 
+        pending_messages = []
+        running = True
+        mutex = threading.Lock()
+
         def worker():
-            pending_messages = []
-            last_flush_time = time.time()
+            nonlocal running
+            nonlocal pending_messages
+
             # Pause a while to make sure the frontend 
             # could receive the property changes
             time.sleep(0.1)
@@ -145,33 +150,45 @@ class Runner:
                                         executable='/bin/bash')
                 self.process = process
                 for line in process.stdout:
+                    mutex.acquire()
                     pending_messages.append(line)
-                    current_time = time.time()
-                    if current_time - last_flush_time > 0.1:
-                        if len(pending_messages) > 0:
-                            for message in pending_messages:
-                                self.write_message(message)
-                            self.flush()
-                        pending_messages = []
-                        last_flush_time = current_time
+                    mutex.release()
             except Exception as e:
                 self.process_finish_messages.append(str(e))
 
-            for message in pending_messages:
-                self.write_message(message)
+            exit_code = process.poll()
+            mutex.acquire()
 
             for message in self.process_finish_messages:
-                self.write_message(message)
+                pending_messages.append(message)
 
             if len(self.process_finish_messages) == 0:
-                self.write_message(f"Process finished with exit code {process.poll()}")
-            self.flush()
+                pending_messages.append(f"Process finished with exit code {exit_code}")
 
             self.is_executed = False
             self.log_view.running = False
+            running = False
+            mutex.release()
 
-        thread = threading.Thread(target=worker, args=())
-        thread.start()
+        def writer():
+            nonlocal running
+            nonlocal pending_messages
+            while running:
+                time.sleep(0.1)
+                mutex.acquire()
+                if len(pending_messages) > 0:
+                    for message in pending_messages:
+                        self.write_message(message)
+                    self.flush()
+                    pending_messages = []
+                mutex.release()
+
+        worker_thread = threading.Thread(target=worker, args=())
+        worker_thread.start()
+
+        writer_thread = threading.Thread(target=writer, args=())
+        writer_thread.start()
+
         next()
 
     def execute_notification(self, next):
