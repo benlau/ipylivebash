@@ -1,5 +1,4 @@
 from IPython.display import display
-import ipywidgets as widgets
 import subprocess
 import argparse
 import sys
@@ -75,7 +74,9 @@ class Runner:
 
     def run(self, script):
         self.script = script
+
         display(self.log_view)
+
         funcs = [
             lambda next: self.execute_confirmation(next),
             lambda _: self.run_without_confirmation(),
@@ -131,10 +132,11 @@ class Runner:
         def worker():
             pending_messages = []
             last_flush_time = time.time()
+            # Pause a while to make sure the frontend 
+            # could receive the property changes
+            time.sleep(0.1)
+
             try:
-                # Pause a while to make sure the frontend 
-                # could receive the property changes
-                time.sleep(0.1)
                 process = subprocess.Popen(script,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT,
@@ -161,7 +163,8 @@ class Runner:
             for message in self.process_finish_messages:
                 self.write_message(message)
 
-            self.write_message(f"Process finished with exit code {process.poll()}")
+            if len(self.process_finish_messages) == 0:
+                self.write_message(f"Process finished with exit code {process.poll()}")
             self.flush()
 
             self.is_executed = False
@@ -188,7 +191,12 @@ class Runner:
 
     def execute_logger(self, next):
         if self.args.output_file is not None:
-            self.log_file.open()
+            try:
+                self.log_file.open()
+            except OSError as e:
+                self.log_view.write_message(str(e))
+                self.log_view.flush()
+                return
             next()
             self.log_file.close()
         else:

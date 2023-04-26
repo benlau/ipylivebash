@@ -85,9 +85,9 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
                 clear();
                 onEvent?.({type: "confirmToRun"});
             },() => {
-                // do nothing
+                log("Canceled");
             });
-    }, [confirmationDialogMethods, onEvent, clear]);
+    }, [confirmationDialogMethods, onEvent, clear, log]);
 
     const sendAction = React.useCallback((action: string) => {
         const {

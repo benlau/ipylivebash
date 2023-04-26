@@ -81,6 +81,5 @@ export const LiveBashPanelConfirmationStory = (args) => {
 
 LiveBashPanelConfirmationStory.storyName = "LiveBashPanel(Confirmation Dialog Visible)";
 LiveBashPanelConfirmationStory.args = {
-    messages: ["Hello",  "World"],
     confirmationRequired: true
 }
