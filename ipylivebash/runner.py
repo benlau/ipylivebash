@@ -157,7 +157,14 @@ class Runner:
                 self.process_finish_messages.append(str(e))
 
             exit_code = process.poll()
+
             mutex.acquire()
+
+            if self.args.send_notification:
+                self.log_view.notification_message = "The script is finished"
+
+            pending_messages.append(f"{self.args.send_notification}")
+
 
             for message in self.process_finish_messages:
                 pending_messages.append(message)
@@ -169,6 +176,7 @@ class Runner:
             self.log_view.running = False
             running = False
             mutex.release()
+
 
         def writer():
             nonlocal running
@@ -202,7 +210,6 @@ class Runner:
                     f"Request notification permission failed: {permission}")
                 return
             next()
-            self.log_view.notification_message = "The script is finished"
 
         self.log_view.request_notification_permission(callback)
 
