@@ -52,9 +52,6 @@ class Runner:
         parser.add_argument('--notify',
                             action='store_true', dest='send_notification',
                             help="Send a notification when the script finished")
-        parser.add_argument('--keep-cell-output',
-                            action='store_true', dest='keep_cell_output',
-                            help="Keep the cell output")
         self.args = parser.parse_args(args)
         self.parser = parser
         self.log_view = LogView()
@@ -107,10 +104,6 @@ class Runner:
         self.line_printed = self.line_printed + 1
         if self.args.output_file is not None:
             self.log_file.write_message(line)
-
-        if self.args.keep_cell_output is True:
-            sys.stdout.write(line)
-            return
 
         if (self.line_printed >= self.args.line_limit and
                 self.args.line_limit > 0):
