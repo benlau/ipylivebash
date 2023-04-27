@@ -44,7 +44,7 @@ class Runner:
                             dest='line_limit', default=0, type=int,
                             help="Restrict the no. of lines to be shown")
         parser.add_argument('--height',
-                            dest='height', default=0, type=int,
+                            dest='height', default=4, type=int,
                             help="Set the height of the output cell (no. of line)")
         parser.add_argument('--ask-confirm',
                             action='store_true', dest='ask_confirm',
@@ -162,9 +162,6 @@ class Runner:
 
             if self.args.send_notification:
                 self.log_view.notification_message = "The script is finished"
-
-            pending_messages.append(f"{self.args.send_notification}")
-
 
             for message in self.process_finish_messages:
                 pending_messages.append(message)

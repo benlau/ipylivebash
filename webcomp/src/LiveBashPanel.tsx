@@ -163,7 +163,7 @@ export function LiveBashPanel(props: Props) {
     } = props;
     const classes = useStyles();
 
-    const maxHeight = heightInLines > 0 ? heightInLines * 1.2 + "em" : undefined;
+    const textViewHeight = heightInLines > 0 ? heightInLines * 1.2 + "em" : undefined;
 
     React.useEffect(() => {
         // scroll to end
@@ -191,7 +191,7 @@ export function LiveBashPanel(props: Props) {
             <Toolbar isRunning={isRunning} onStopClick={onStopClicked}/>
             <ConfirmationDialog {...confirmationDialogProps}/>
             <LoadingSpinner isRunning={isRunning}/>
-            <div style={{maxHeight}} className={classes.textViewContainer} ref={textViewcontainerRef}>
+            <div style={{height: textViewHeight}} className={classes.textViewContainer} ref={textViewcontainerRef}>
                 <div className={classes.textView} ref={textViewRef}>
                     <>
                         {

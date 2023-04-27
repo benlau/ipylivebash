@@ -12,11 +12,11 @@ const useStyles = createUseStyles({
         cursor: "pointer",
         userSelect: "none",
         "&:hover" : {
-            backgroundColor: "#ffe7e7",
+            backgroundColor: "#e7e7e7",
             color: "#a4262c"
         },
         "&:active": {
-            backgroundColor: "#ffe7e77f",
+            backgroundColor: "#e7e7e77f",
             color: "#a4262c"
         },
         "&[disabled]": {
