@@ -211,10 +211,7 @@ class Runner:
                 self.log_view.write_message(str(e))
                 self.log_view.flush()
                 return
-            next()
-            self.log_file.close()
-        else:
-            next()
+        next()
 
     def on_response(self, change):
         response = json.loads(change.new)
