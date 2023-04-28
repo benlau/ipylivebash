@@ -63,7 +63,8 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
     } = useConfirmationDialog();
 
     const mutableState = React.useRef({
-        messages
+        messages,
+        lastTotalLines: 0
     });
 
     const log = React.useCallback((message: string) => {
@@ -115,11 +116,13 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
         confirmationRequired,
         onEvent,
         askRunConfirmation,
-        clear
+        clear,
+        mutableState
     }), [messages, status, statusHeader, isRunning, 
         heightInLines, textViewcontainerRef, textViewRef, 
         confirmationDialogProps, onEvent,
-        confirmationRequired, askRunConfirmation, clear]);
+        confirmationRequired, askRunConfirmation, clear,
+        mutableState]);
 
     const methods = React.useMemo(() => ({
         log,
@@ -160,17 +163,22 @@ export function LiveBashPanel(props: Props) {
         confirmationDialogProps,
         confirmationRequired,
         askRunConfirmation,
+        mutableState
     } = props;
     const classes = useStyles();
 
     const textViewHeight = heightInLines > 0 ? heightInLines * 1.2 + "em" : undefined;
 
     React.useEffect(() => {
-        // scroll to end
+        // auto scroll to end
         if (textViewcontainerRef.current && textViewRef.current) {
-            textViewcontainerRef.current.scrollTop = textViewRef.current.scrollHeight;
+            const totalLines = (messages?.length ?? 0) + (status?.length ?? 0);
+            if (totalLines > mutableState.current.lastTotalLines) {
+                textViewcontainerRef.current.scrollTop = textViewRef.current.scrollHeight;
+                mutableState.current.lastTotalLines = totalLines;
+            }
         }
-    }, [messages, textViewRef, textViewcontainerRef]);
+    }, [messages, textViewRef, textViewcontainerRef, status, mutableState]);
 
     React.useEffect(() => {
         if (!confirmationRequired) {
