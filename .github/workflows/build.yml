@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: main
+    branches: "*"
   pull_request:
     branches: "*"
 
@@ -15,7 +15,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "14.x"
       - name: Install Python
         uses: actions/setup-python@v2
         with:
@@ -44,20 +44,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install -U pip setuptools codecov
-          npm install -g codecov
+          python -m pip install -U pip setuptools codecov jupyterlab jupyter_packaging
+          yarn global add codecov
+          cd webcomp && yarn install
       - name: Test the extension
         run: |
           python -m pip install --upgrade -v -e ".[test, examples, docs]"
-          yarn run lint:check
-
           pytest
+
+          yarn run lint:check
+          make build_js
           yarn run test
 
-      - name: Check docs can be build + links
+      - name: Build package
         run: |
-          sudo apt install -y pandoc
-          pushd docs
-          make html
-          python -m pytest --check-links
-          popd
+          make build_package
+          rm dist/index*
+
+      - name: Archive package
+        uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: dist/*

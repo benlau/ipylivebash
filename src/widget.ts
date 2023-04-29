@@ -28,7 +28,7 @@ export class LogViewModel extends DOMWidgetModel {
       notification_message: '',
       response: '',
       action: '',
-      confirmation_required: false
+      confirmation_required: false,
     };
   }
 
@@ -55,7 +55,7 @@ export class LogView extends DOMWidgetView {
     const panel = document.createElement('live-bash-panel');
     this.el.appendChild(panel);
     this.panel = panel;
-    this.panel.setAttribute('tabIndex', "1");
+    this.panel.setAttribute('tabIndex', '1');
     this.panel.addEventListener('response', (e: any) => {
       this.onPanelResponse(JSON.stringify(e.detail));
     });
@@ -79,25 +79,24 @@ export class LogView extends DOMWidgetView {
       this.onNotificationMessageChanged,
       this
     );
-    this.model.on(
-      'change:action',
-      this.onActionChanged,
-      this
-    )
+    this.model.on('change:action', this.onActionChanged, this);
     this.model.on(
       'change:confirmation_required',
       this.onConfirmationRequiredChanged,
-      this)
+      this
+    );
   }
 
   messagesChanged() {
     const value = this.model.get('messages');
-    this.panel.setAttribute('messages', 
-      value.map((v: string) => 
-      {
-        const str = Number.isInteger(v) ? v.toString() : v;
-        return str.replace(/^\s+|\s+$/gm, '')}
-      ).join("\n")
+    this.panel.setAttribute(
+      'messages',
+      value
+        .map((v: string) => {
+          const str = Number.isInteger(v) ? v.toString() : v;
+          return str.replace(/^\s+|\s+$/gm, '');
+        })
+        .join('\n')
     );
   }
 
@@ -108,7 +107,7 @@ export class LogView extends DOMWidgetView {
 
   statusChanged() {
     const value = this.model.get('status');
-    this.panel.setAttribute('status', value.join("\n"));
+    this.panel.setAttribute('status', value.join('\n'));
   }
 
   heightChanged() {
@@ -157,7 +156,7 @@ export class LogView extends DOMWidgetView {
     const value = {
       id: responseId++,
       content,
-    }
+    };
 
     this.model.set('response', JSON.stringify(value));
     this.model.save_changes();
