@@ -4,5 +4,4 @@
 # Copyright (c) Ben lau.
 # Distributed under the terms of the Modified BSD License.
 
-version_info = (0, 1, 2)
-__version__ = ".".join(map(str, version_info))
+__version__ = '0.2.0a0'

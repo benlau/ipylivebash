@@ -141,6 +141,7 @@ export class LogView extends DOMWidgetView {
     const value = this.model.get('notification_message');
     const notification = new Notification('livebash', {
       body: value,
+      requireInteraction: true
     });
     notification.onclick = (e) => {
       notification.close();

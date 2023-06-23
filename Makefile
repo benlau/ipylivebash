@@ -22,8 +22,11 @@ build_package: build_webcomp
 
 .PHONY: clean
 clean:
+	rm -rf build
 	rm -rf dist
 	rm -rf *.egg-info
+	rm -rf webcomp/.parcel
+	rm -rf webcomp/.parcel-cache
 
 .PHONY: try-publish
 try-publish:

@@ -1,6 +1,6 @@
 {
   "name": "ipylivebash",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.0",
   "description": "A Custom Jupyter Widget Library",
   "keywords": [
     "jupyter",
@@ -13,9 +13,9 @@
     "dist/*.js",
     "css/*.css"
   ],
-  "homepage": "https://github.com//ipylivebash",
+  "homepage": "https://github.com/benlau/ipylivebash",
   "bugs": {
-    "url": "https://github.com//ipylivebash/issues"
+    "url": "https://github.com/benlau/ipylivebash/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -26,7 +26,7 @@
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com//ipylivebash"
+    "url": "https://github.com/benlau/ipylivebash"
   },
   "scripts": {
     "build": "yarn run build:lib && yarn run build:nbextension && yarn run build:labextension:dev",
