@@ -33,25 +33,42 @@ def run_chain(funcs):
 class Runner:
     def __init__(self, args):
         parser = argparse.ArgumentParser(prog="livebash", add_help=False)
-        parser.add_argument('-h', '--help',
-                            action='store_true', dest='print_help')
-        parser.add_argument('--save',
-                            dest='output_file', type=str, help="Save output to a file")
-        parser.add_argument('--save-timestamp',
-                            action='store_true', dest='use_timestamp',
-                            help="Add timestamp to the output file name")
-        parser.add_argument('--line-limit',
-                            dest='line_limit', default=0, type=int,
-                            help="Restrict the no. of lines to be shown")
-        parser.add_argument('--height',
-                            dest='height', default=4, type=int,
-                            help="Set the height of the output cell (no. of line)")
-        parser.add_argument('--ask-confirm',
-                            action='store_true', dest='ask_confirm',
-                            help="Ask for confirmation before execution")
-        parser.add_argument('--notify',
-                            action='store_true', dest='send_notification',
-                            help="Send a notification when the script finished")
+        parser.add_argument("-h", "--help", action="store_true", dest="print_help")
+        parser.add_argument(
+            "--save", dest="output_file", type=str, help="Save output to a file"
+        )
+        parser.add_argument(
+            "--save-timestamp",
+            action="store_true",
+            dest="use_timestamp",
+            help="Add timestamp to the output file name",
+        )
+        parser.add_argument(
+            "--line-limit",
+            dest="line_limit",
+            default=0,
+            type=int,
+            help="Restrict the no. of lines to be shown",
+        )
+        parser.add_argument(
+            "--height",
+            dest="height",
+            default=4,
+            type=int,
+            help="Set the height of the output cell (no. of line)",
+        )
+        parser.add_argument(
+            "--ask-confirm",
+            action="store_true",
+            dest="ask_confirm",
+            help="Ask for confirmation before execution",
+        )
+        parser.add_argument(
+            "--notify",
+            action="store_true",
+            dest="send_notification",
+            help="Send a notification when the script finished",
+        )
         self.args = parser.parse_args(args)
         self.parser = parser
         self.log_view = LogView()
@@ -60,14 +77,13 @@ class Runner:
 
         self.process = None
         self.process_finish_messages = [""]
-        
+
         if self.args.output_file is not None:
             self.log_file = LogFile(
-                pattern=self.args.output_file,
-                use_timestamp=self.args.use_timestamp
+                pattern=self.args.output_file, use_timestamp=self.args.use_timestamp
             )
         self.log_view.height = self.args.height
-        self.log_view.observe(self.on_response, names='response')
+        self.log_view.observe(self.on_response, names="response")
 
     def run(self, script):
         self.script = script
@@ -84,7 +100,7 @@ class Runner:
         funcs = [
             lambda next: self.execute_notification(next),
             lambda next: self.execute_logger(next),
-            lambda next: self.execute_script(self.script, next)
+            lambda next: self.execute_script(self.script, next),
         ]
         run_chain(funcs)
 
@@ -105,8 +121,7 @@ class Runner:
         if self.args.output_file is not None:
             self.log_file.write_message(line)
 
-        if (self.line_printed >= self.args.line_limit and
-                self.args.line_limit > 0):
+        if self.line_printed >= self.args.line_limit and self.args.line_limit > 0:
             if self.log_view.status_header == "":
                 self.log_view.status_header = "=== Output exceed the line limitation. Only the latest output will be shown ==="  # noqa
             self.log_view.write_status(line)
@@ -130,17 +145,19 @@ class Runner:
             nonlocal running
             nonlocal pending_messages
 
-            # Pause a while to make sure the frontend 
+            # Pause a while to make sure the frontend
             # could receive the property changes
             time.sleep(0.1)
 
             try:
-                process = subprocess.Popen(script,
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.STDOUT,
-                                        shell=True,
-                                        universal_newlines=True,
-                                        executable='/bin/bash')
+                process = subprocess.Popen(
+                    script,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    shell=True,
+                    universal_newlines=True,
+                    executable="/bin/bash",
+                )
                 self.process = process
                 for line in process.stdout:
                     mutex.acquire()
@@ -166,7 +183,6 @@ class Runner:
             self.log_view.running = False
             running = False
             mutex.release()
-
 
         def writer():
             nonlocal running
@@ -197,7 +213,8 @@ class Runner:
         def callback(permission):
             if permission != "granted":
                 self.log_view.write_message(
-                    f"Request notification permission failed: {permission}")
+                    f"Request notification permission failed: {permission}"
+                )
                 return
             next()
 
@@ -215,9 +232,9 @@ class Runner:
 
     def on_response(self, change):
         response = json.loads(change.new)
-        content = json.loads(response['content'])
-        if content['type'] == 'requestToStop':
+        content = json.loads(response["content"])
+        if content["type"] == "requestToStop":
             self.process_finish_messages.append("Force terminated")
             self.process.terminate()
-        elif content['type'] == 'confirmToRun':
+        elif content["type"] == "confirmToRun":
             self.run_without_confirmation()

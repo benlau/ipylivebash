@@ -1,6 +1,6 @@
 .PHONY: test
 test:
-	poetry run pytest
+	pytest -s
 	npm run test
 
 .PHONY: build_webcomp
@@ -31,3 +31,7 @@ clean:
 .PHONY: try-publish
 try-publish:
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+.PHONY: lint-fix
+lint-fix:
+	black ipylivebash

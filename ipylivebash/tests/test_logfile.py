@@ -17,5 +17,7 @@ def test_gen_filename_with_timestamp():
     with patch("datetime.datetime") as mock:
         mock.now.return_value = mock_date
         mock.side_effect = lambda *args, **kw: datetime(*args, **kw)
-        assert LogFile.gen_filename(
-            "output.log", use_timestamp=True) == "output-20000101-010000.log"
+        assert (
+            LogFile.gen_filename("output.log", use_timestamp=True)
+            == "output-20000101-010000.log"
+        )

@@ -18,4 +18,5 @@ def debounce(wait):
             fn(*args, **kwargs)
 
         return debounced
+
     return decorator

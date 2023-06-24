@@ -4,10 +4,11 @@
 # Copyright (c) Ben lau.
 # Distributed under the terms of the Modified BSD License.
 
-from .logview import LogView # noqa
-from .runner import Runner, run_script #noqa
-from ._version import __version__ # noqa
+from .logview import LogView  # noqa
+from ._version import __version__  # noqa
 from IPython.core.magic import register_cell_magic
+from .session_manager import run_script  # noqa
+from .runner import Runner
 
 
 def _jupyter_labextension_paths():
@@ -22,10 +23,12 @@ def _jupyter_labextension_paths():
         from `src` directory into <jupyter path>/labextensions/<dest> directory
         during widget installation
     """
-    return [{
-        'src': 'labextension',
-        'dest': 'ipylivebash',
-    }]
+    return [
+        {
+            "src": "labextension",
+            "dest": "ipylivebash",
+        }
+    ]
 
 
 def _jupyter_nbextension_paths():
@@ -44,18 +47,21 @@ def _jupyter_nbextension_paths():
     require: Path to importable AMD Javascript module inside the
         <jupyter path>/nbextensions/<dest> directory
     """
-    return [{
-        'section': 'notebook',
-        'src': 'nbextension',
-        'dest': 'ipylivebash',
-        'require': 'ipylivebash/extension'
-    }]
+    return [
+        {
+            "section": "notebook",
+            "src": "nbextension",
+            "dest": "ipylivebash",
+            "require": "ipylivebash/extension",
+        }
+    ]
 
 
 def in_notebook():
     try:
         from IPython import get_ipython
-        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
+
+        if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
             return False
     except ImportError:
         return False
@@ -65,6 +71,7 @@ def in_notebook():
 
 
 if in_notebook():
+
     @register_cell_magic
     def livebash(line, cell):
         runner = Runner(line.split() if line else "")

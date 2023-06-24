@@ -11,9 +11,7 @@ class LogFile:
     def open(self):
         suffix = None
         filename = LogFile.gen_filename(
-            self.pattern,
-            suffix=suffix,
-            use_timestamp=self.use_timestamp
+            self.pattern, suffix=suffix, use_timestamp=self.use_timestamp
         )
         suffix = 0
         while True:
@@ -22,9 +20,7 @@ class LogFile:
 
             suffix = suffix + 1
             filename = LogFile.gen_filename(
-                self.pattern,
-                suffix=suffix,
-                use_timestamp=self.use_timestamp
+                self.pattern, suffix=suffix, use_timestamp=self.use_timestamp
             )
 
         self.fd = open(filename, "wt")
@@ -44,7 +40,7 @@ class LogFile:
     def gen_filename(cls, pattern, suffix=None, use_timestamp=False):
         if use_timestamp is True:
             now = datetime.datetime.now()
-            suffix = now.strftime('%Y%m%d-%H%M%S')
+            suffix = now.strftime("%Y%m%d-%H%M%S")
 
         if suffix is None:
             return pattern
