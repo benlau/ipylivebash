@@ -39,7 +39,7 @@
     "clean:lib": "rimraf lib",
     "clean:labextension": "rimraf ipylivebash/labextension",
     "clean:nbextension": "rimraf ipylivebash/nbextension/static/index.js",
-    "lint": "eslint . --ext .ts,.tsx --fix",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "lint:check": "eslint . --ext .ts,.tsx",
     "prepack": "yarn run build:lib",
     "test": "jest",

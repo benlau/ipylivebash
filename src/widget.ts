@@ -6,7 +6,7 @@ import {
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 import '../css/widget.css';
-import './webcomp';
+import { LiveBashPanelRenderer } from './webcomp';
 
 export class LogViewModel extends DOMWidgetModel {
   defaults() {
@@ -50,15 +50,30 @@ export class LogView extends DOMWidgetView {
   views: any = {};
   status = '';
   panel: HTMLElement;
+  renderer?: any;
 
   render() {
-    const panel = document.createElement('live-bash-panel');
+    const panel = document.createElement('div');
+    const onEvent = (event: any) => {
+      this.onPanelResponse(JSON.stringify(event));
+    };
+
+    const onReady = () => {
+      const isRunning = this.model.get('running');
+      const heightInLines = parseInt(this.model.get('height'));
+      const confirmationRequired = this.model.get('confirmation_required');
+
+      this.renderer.setAttribute('is-running', isRunning);
+      this.renderer.setAttribute('height-in-lines', heightInLines);
+      this.renderer.setAttribute('confirmation-required', confirmationRequired);
+    };
+
+    this.renderer = new LiveBashPanelRenderer(panel, onEvent, onReady);
+    this.renderer.render();
+
     this.el.appendChild(panel);
     this.panel = panel;
-    this.panel.setAttribute('tabIndex', '1');
-    this.panel.addEventListener('response', (e: any) => {
-      this.onPanelResponse(JSON.stringify(e.detail));
-    });
+    this.renderer.setAttribute('tabIndex', '1');
 
     this.heightChanged();
     this.runningChanged();
@@ -89,7 +104,7 @@ export class LogView extends DOMWidgetView {
 
   messagesChanged() {
     const value = this.model.get('messages');
-    this.panel.setAttribute(
+    this.renderer.setAttribute(
       'messages',
       value
         .map((v: string) => {
@@ -102,17 +117,17 @@ export class LogView extends DOMWidgetView {
 
   statusHeaderChanged() {
     const value = this.model.get('status_header');
-    this.panel.setAttribute('status-header', value);
+    this.renderer.setAttribute('status-header', value);
   }
 
   statusChanged() {
     const value = this.model.get('status');
-    this.panel.setAttribute('status', value.join('\n'));
+    this.renderer.setAttribute('status', value.join('\n'));
   }
 
   heightChanged() {
     const value = this.model.get('height');
-    this.panel.setAttribute('height-in-lines', value);
+    this.renderer.setAttribute('height-in-lines', value);
   }
 
   onNotificationPermissionRequestChanged() {
@@ -141,7 +156,7 @@ export class LogView extends DOMWidgetView {
     const value = this.model.get('notification_message');
     const notification = new Notification('livebash', {
       body: value,
-      requireInteraction: true
+      requireInteraction: true,
     });
     notification.onclick = (e) => {
       notification.close();
@@ -150,7 +165,7 @@ export class LogView extends DOMWidgetView {
 
   runningChanged() {
     const value = this.model.get('running');
-    this.panel.setAttribute('is-running', value);
+    this.renderer.setAttribute('is-running', value);
   }
 
   onPanelResponse(content: string) {
@@ -166,11 +181,11 @@ export class LogView extends DOMWidgetView {
 
   onConfirmationRequiredChanged() {
     const value = this.model.get('confirmation_required');
-    this.panel.setAttribute('confirmation-required', value);
+    this.renderer.setAttribute('confirmation-required', value);
   }
 
   onActionChanged() {
     const value = this.model.get('action');
-    this.panel.setAttribute('action', value);
+    this.renderer.setAttribute('action', value);
   }
 }

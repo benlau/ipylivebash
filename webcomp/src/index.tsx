@@ -1,7 +1,10 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { LiveBashPanel, useLiveBashPanel } from "./LiveBashPanel"
-import {JssProvider, SheetsRegistry } from 'react-jss'
+import {JssProvider, SheetsRegistry } from "react-jss"
+import {LiveBashPanelRenderer as _LiveBashPanelRenderer} from "./LiveBashPanelRenderer";
+
+export const LiveBashPanelRenderer = _LiveBashPanelRenderer;
 
 interface Delegate {
     methods?: ReturnType<typeof useLiveBashPanel>["methods"];

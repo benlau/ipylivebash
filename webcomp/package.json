@@ -1,15 +1,21 @@
 {
   "name": "ipylivebash-webcomp",
   "version": "1.0.0",
-  "source": "src/index.html",
+  "source": "src/index.tsx",
+  "module": "dist/module.js",
   "license": "MIT",
   "scripts": {
-    "build": "parcel build src/index.html  --no-content-hash",
+    "build": "parcel build --no-content-hash",
     "start": "parcel src/index.html",
     "clean": "rm -f dist/*",
     "lint": "eslint . --ext .ts --ext .tsx",
     "lint:fix": "eslint . --ext .tsx --ext .ts --fix"
   },
+  "targets": {
+    "module": {
+       "includeNodeModules": true
+    }
+  },  
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.3",
     "@babel/preset-env": "^7.21.4",

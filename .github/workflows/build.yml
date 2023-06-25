@@ -50,6 +50,7 @@ jobs:
       - name: Test the extension
         run: |
           python -m pip install --upgrade -v -e ".[test, examples, docs]"
+          pip install pytest-asyncio
           pytest
 
           yarn run lint:check
