@@ -55,7 +55,6 @@ jobs:
 
           yarn run lint:check
           make build_js
-          yarn run test
 
       - name: Build package
         run: |

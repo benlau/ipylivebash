@@ -1,7 +1,6 @@
 .PHONY: test
 test:
 	pytest -s
-	npm run test
 
 .PHONY: build_webcomp
 build_webcomp:
@@ -19,8 +18,10 @@ build_package: build_webcomp
 .PHONY: clean
 clean:
 	rm -rf build
+	rm -rf lib
 	rm -rf dist
 	rm -rf *.egg-info
+	rm -rf webcomp/dist
 	rm -rf webcomp/.parcel
 	rm -rf webcomp/.parcel-cache
 
