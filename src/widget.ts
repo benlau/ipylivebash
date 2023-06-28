@@ -6,7 +6,7 @@ import {
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 import '../css/widget.css';
-import { LiveBashPanelRenderer } from './webcomp';
+import { LiveBashPanelRenderer } from '../webcomp';
 
 export class LogViewModel extends DOMWidgetModel {
   defaults() {
