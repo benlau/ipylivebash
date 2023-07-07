@@ -1,11 +1,12 @@
 from .logfile import LogFile
-from .session import Session
+from .session import Session, SessionState
 import asyncio
 from .logview import LogView
 from .utils import run_chain, left_pad
 from IPython.display import display
 import time
 import json
+from tabulate import tabulate
 
 instance = None
 
@@ -25,7 +26,7 @@ async def run_script(script):
         # FIXME - Run by session_manager
         return await session.run(output=output)
     except asyncio.CancelledError:
-        session.kill()
+        manager.kill(session.id)
         print("Force terminated")
 
 
@@ -35,6 +36,11 @@ class SessionManager:
         self.next_id = 1
 
         self.views = []
+
+    def print_sessions(self):
+        headers = ["Session ID", "State"]
+        rows = [[session.id, session.state.value] for session in self.sessions]
+        print(tabulate(rows, headers=headers))
 
     def create_session(self):
         session = Session()
@@ -119,6 +125,7 @@ class SessionManager:
         session_id = session.id
 
         self.set_view_property(session_id, "running", True)
+        session.state = SessionState.Running
 
         def output(message):
             self.write_message(session_id, message)
@@ -170,8 +177,6 @@ class SessionManager:
                 setattr(view, key, value)
 
     def on_session_finished(self, session_id, exit_code):
-        # FIXME: Close log_file
-
         session = self.find_session(session_id)
         if session is None:
             return
@@ -193,10 +198,15 @@ class SessionManager:
         self.flush(session_id)
         self.set_view_property(session_id, "running", False)
 
+        if session.log_file is not None:
+            session.log_file.close()
+
         if session.args.send_notification is True:
             self.set_view_property(
                 session_id, "notification_message", "The script is finished"
             )
+        if session.state is not SessionState.ForceTerminated:
+            session.state = SessionState.Completed
 
     def find_session(self, id):
         for session in self.sessions:
@@ -211,7 +221,7 @@ class SessionManager:
                 session = self.find_session(session_id)
                 if session is not None:
                     session.process_finish_messages.append("Force terminated")
-                    session.kill()
+                    self.kill(session.id)
             elif content["type"] == "confirmToRun":
                 session = self.find_session(session_id)
                 next = session.next
@@ -226,3 +236,11 @@ class SessionManager:
         if instance is None:
             instance = SessionManager()
         return instance
+
+    def kill(self, session_id):
+        session = self.find_session(session_id)
+        if session is None:
+            return
+
+        session.kill()
+        session.state = SessionState.ForceTerminated

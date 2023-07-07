@@ -19,6 +19,9 @@ class LiveMagic:
         parser = argparse.ArgumentParser(prog="livebash", add_help=False)
         parser.add_argument("-h", "--help", action="store_true", dest="print_help")
         parser.add_argument(
+            "-ls", "--list-session", action="store_true", dest="list_session"
+        )
+        parser.add_argument(
             "--save", dest="output_file", type=str, help="Save output to a file"
         )
         parser.add_argument(
@@ -55,19 +58,6 @@ class LiveMagic:
         )
         self.args = parser.parse_args(args)
         self.parser = parser
-        # self.log_view = LogView()
-        # self.line_printed = 0
-        # self.is_executed = False
-
-        # self.process = None
-        # self.process_finish_messages = [""]
-
-        # if self.args.output_file is not None:
-        #     self.log_file = LogFile(
-        #         pattern=self.args.output_file, use_timestamp=self.args.use_timestamp
-        #     )
-        # self.log_view.height = self.args.height
-        # self.log_view.observe(self.on_response, names="response")
 
     def run(self, script):
         session = self.session_manager.create_session()

@@ -7,7 +7,7 @@
 from .logview import LogView  # noqa
 from ._version import __version__  # noqa
 from IPython.core.magic import register_cell_magic
-from .sessionmanager import run_script  # noqa
+from .sessionmanager import SessionManager, run_script  # noqa
 from .livemagic import LiveMagic
 
 
@@ -79,4 +79,10 @@ if in_notebook():
         if live_magic.args.print_help:
             live_magic.parser.print_help()
             return
+
+        if live_magic.args.list_session:
+            session_manager = SessionManager.get_instance()
+            session_manager.print_sessions()
+            return
+
         live_magic.run(cell)
