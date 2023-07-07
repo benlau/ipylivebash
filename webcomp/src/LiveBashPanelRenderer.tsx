@@ -80,7 +80,7 @@ export class LiveBashPanelRenderer {
         } else if (name === "action") {
             this.delegate.methods.sendAction(newValue);
         } else if (name === "confirmation-required") {
-            this.delegate.methods.setConfirmationRequired(newValue === "true");
+            this.delegate.methods.setConfirmationRequired(newValue);
         }
     }
 }

@@ -7,8 +7,8 @@
 from .logview import LogView  # noqa
 from ._version import __version__  # noqa
 from IPython.core.magic import register_cell_magic
-from .session_manager import run_script  # noqa
-from .runner import Runner
+from .sessionmanager import run_script  # noqa
+from .livemagic import LiveMagic
 
 
 def _jupyter_labextension_paths():
@@ -74,8 +74,9 @@ if in_notebook():
 
     @register_cell_magic
     def livebash(line, cell):
-        runner = Runner(line.split() if line else "")
-        if runner.args.print_help:
-            runner.parser.print_help()
+        live_magic = LiveMagic()
+        live_magic.parse(line.split() if line else "")
+        if live_magic.args.print_help:
+            live_magic.parser.print_help()
             return
-        runner.run(cell)
+        live_magic.run(cell)

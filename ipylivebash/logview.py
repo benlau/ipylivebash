@@ -23,6 +23,7 @@ class LogView(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
+    session_id = Unicode("").tag(sync=True)
     messages = Any([]).tag(sync=True)
     status_header = Unicode("").tag(sync=True)
     status = Any([]).tag(sync=True)

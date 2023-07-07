@@ -12,7 +12,7 @@ class RunTask:
         self.script = ""
         self.threads = []
 
-    def __call__(self, print=print, flush=None):
+    def __call__(self, output=print, flush=None):
         mutex = threading.Lock()
         pending_messages = []
         running = True
@@ -49,14 +49,14 @@ class RunTask:
         def writer():
             nonlocal running
             nonlocal pending_messages
-            nonlocal print
+            nonlocal output
             while running:
                 time.sleep(0.1)
                 mutex.acquire()
                 if len(pending_messages) > 0:
                     for message in pending_messages:
-                        print(message)
-                    if flush:
+                        output(message)
+                    if flush is not None:
                         flush()
                     pending_messages = []
                 mutex.release()

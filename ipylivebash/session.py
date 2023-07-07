@@ -1,5 +1,5 @@
 from enum import Enum
-from .run_task import RunTask
+from .runtask import RunTask
 
 SHELL = "/bin/bash"
 
@@ -19,11 +19,18 @@ class Session:
         self.script = ""
         self.state = SessionState.NotStarted
         self.task = None
+        self.line_printed = 0
+        self.args = None
+        self.process_finish_messages = []
+        self.exit_code = None
 
-    def run(self, print=print, flush=None):
+        # next function to be involved
+        self.next = None
+
+    def run(self, output=print, flush=None):
         self.task = RunTask()
         self.task.script = self.script
-        return self.task(print=print, flush=flush)
+        return self.task(output=output, flush=flush)
 
     def kill(self):
         self.task.kill()

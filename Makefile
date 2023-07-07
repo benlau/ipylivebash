@@ -32,3 +32,4 @@ try-publish:
 .PHONY: lint-fix
 lint-fix:
 	black ipylivebash
+	cd webcomp && yarn run lint:fix

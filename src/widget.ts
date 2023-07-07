@@ -156,7 +156,7 @@ export class LogView extends DOMWidgetView {
     const value = this.model.get('notification_message');
     const notification = new Notification('livebash', {
       body: value,
-      requireInteraction: true,
+      /* requireInteraction true is not working in Mac */
     });
     notification.onclick = (e) => {
       notification.close();
