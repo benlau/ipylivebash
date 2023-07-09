@@ -34,3 +34,10 @@ class Session:
 
     def kill(self):
         self.task.kill()
+
+    @property
+    def is_finished(self):
+        return (
+            self.state == SessionState.Completed
+            or self.state == SessionState.ForceTerminated
+        )

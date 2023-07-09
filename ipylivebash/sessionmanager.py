@@ -22,20 +22,31 @@ async def run_script(script):
     manager = SessionManager.get_instance()
     session = manager.create_session()
     session.script = script
-    try:
-        # FIXME - Run by session_manager
-        return await session.run(output=output)
-    except asyncio.CancelledError:
-        manager.kill(session.id)
-        print("Force terminated")
+    return await manager.run_session(session, output=output)
 
 
 class SessionManager:
-    def __init__(self):
+    def __init__(self, max_completed_session=10):
         self.sessions = []
         self.next_id = 1
-
+        self.max_completed_session = max_completed_session
         self.views = []
+
+    def refresh_sessions(self):
+        stored_finished_session = 0
+
+        def predicate(session):
+            nonlocal stored_finished_session
+            if session.is_finished:
+                if stored_finished_session < self.max_completed_session:
+                    stored_finished_session = stored_finished_session + 1
+                else:
+                    return False
+            return True
+
+        self.sessions.reverse()
+        self.sessions = list(filter(predicate, self.sessions))
+        self.sessions.reverse()
 
     def print_sessions(self):
         headers = ["Session ID", "State"]
@@ -54,6 +65,22 @@ class SessionManager:
         view.session_id = session.id
         self.views.append(view)
         return view
+
+    async def run_session(self, session, output=print):
+        session.args = {}
+        session.state = SessionState.Running
+        self.refresh_sessions()
+
+        try:
+            exit_code = await session.run(output=output)
+            session.state = SessionState.Completed
+            session.exit_code = exit_code
+        except asyncio.CancelledError:
+            self.kill(session.id)
+            print("Force terminated")
+            session.state = SessionState.ForceTerminated
+
+        self.refresh_sessions()
 
     def run_session_with_view(self, session, args):
         session_id = session.id
