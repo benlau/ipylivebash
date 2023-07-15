@@ -62,10 +62,12 @@ export class LogView extends DOMWidgetView {
       const isRunning = this.model.get('running');
       const heightInLines = parseInt(this.model.get('height'));
       const confirmationRequired = this.model.get('confirmation_required');
+      const script = this.model.get('script');
 
       this.renderer.setAttribute('is-running', isRunning);
       this.renderer.setAttribute('height-in-lines', heightInLines);
       this.renderer.setAttribute('confirmation-required', confirmationRequired);
+      this.renderer.setAttribute('script', script);
     };
 
     this.renderer = new LiveBashPanelRenderer(panel, onEvent, onReady);

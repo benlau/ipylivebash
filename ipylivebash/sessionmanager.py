@@ -88,6 +88,7 @@ class SessionManager:
 
         view = self.create_view(session)
         self.set_view_property(session_id, "height", args.height)
+        self.set_view_property(session_id, "script", session.script)
 
         if args.ask_confirm is True:
             self.set_view_property(session_id, "confirmation_required", True)

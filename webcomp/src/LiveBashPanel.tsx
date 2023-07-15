@@ -3,6 +3,9 @@ import { createUseStyles } from 'react-jss'
 import { LoadingSpinner } from './LoadingSpinner';
 import { Toolbar }  from './Toolbar';
 import { useConfirmationDialog, ConfirmationDialog } from './ConfirmationDialog';
+import { ScrollablePane, useScrollablePaneHandle } from './ScrollablePane';
+import { Page } from "./types";
+import { TextView } from "./TextView";
 
 enum ActionType {
     askRunConfirmation = "askRunConfirmation"
@@ -10,26 +13,6 @@ enum ActionType {
 
 const useStyles = createUseStyles({
     container: {
-    },
-    textViewContainer: {
-        "overflow-y": "auto",
-    },
-    textView: {
-        padding: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0
-        },
-        fontFamily: "monospace",
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.2,
-        '& p': {
-            marginTop: 'unset',
-            marginBottom: 'unset',
-            wordWrap: "break-word",
-            wordBreak: "break-all"
-        }
     },
     statusHeader: {
         padding: {
@@ -45,17 +28,17 @@ interface useLiveBashPanelDefaults {
     onEvent?: (event: any) => void;
 }
 
-export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
+export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults) {
     const [messages, setMessages] = React.useState<string[]>([]);
     const [status, setStatus] = React.useState<string[]>([]);
     const [statusHeader, setStatusHeader] = React.useState<string>("");
     const [isRunning, setIsRunning] = React.useState<boolean>(false);
     const [heightInLines, setHeightInLines] = React.useState<number>(0);
     const [confirmationRequired, setConfirmationRequired] = React.useState<boolean>(false);
+    const [script, setScript] = React.useState<string>("");
+    const [page, setPage] = React.useState<Page>(Page.TerminalPage);
 
-    const textViewcontainerRef = React.useRef<HTMLDivElement>(null);
-    const textViewRef = React.useRef<HTMLDivElement>(null);
-    const onEvent = defaults?.onEvent;
+    const onEvent = defaultValues?.onEvent;
 
     const {
         props: confirmationDialogProps,
@@ -110,19 +93,23 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
         statusHeader,
         isRunning,
         heightInLines,
-        textViewcontainerRef,
-        textViewRef,
         confirmationDialogProps,
         confirmationRequired,
         onEvent,
         askRunConfirmation,
         clear,
-        mutableState
+        mutableState,
+        page,
+        setPage,
+        script
     }), [messages, status, statusHeader, isRunning, 
-        heightInLines, textViewcontainerRef, textViewRef, 
+        heightInLines,
         confirmationDialogProps, onEvent,
         confirmationRequired, askRunConfirmation, clear,
-        mutableState]);
+        mutableState, 
+        page, 
+        setPage,
+        script]);
 
     const methods = React.useMemo(() => ({
         log,
@@ -134,10 +121,11 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
         askRunConfirmation,
         sendAction,
         setConfirmationRequired,
-        clear
+        clear,
+        setScript,
     }), [log, setStatus, setStatusHeader, setIsRunning,
         setMessages, setHeightInLines, askRunConfirmation, sendAction
-        , setConfirmationRequired, clear]);
+        , setConfirmationRequired, clear, setScript]);
 
     return React.useMemo(() => ({
         props,
@@ -148,7 +136,7 @@ export function useLiveBashPanel(defaults?: useLiveBashPanelDefaults) {
     ])
 }
 
-type Props = ReturnType<typeof useLiveBashPanel>["props"]
+type Props = ReturnType<typeof useLiveBashPanelHandle>["props"]
 
 export function LiveBashPanel(props: Props) {
     const {
@@ -157,28 +145,31 @@ export function LiveBashPanel(props: Props) {
         statusHeader,
         isRunning,
         heightInLines,
-        textViewcontainerRef,
-        textViewRef,
         onEvent,
         confirmationDialogProps,
         confirmationRequired,
         askRunConfirmation,
-        mutableState
+        mutableState,
+        page,
+        setPage,
+        script
     } = props;
     const classes = useStyles();
 
     const textViewHeight = heightInLines > 0 ? heightInLines * 1.2 + "em" : undefined;
 
+    const terminalOutputHandle = useScrollablePaneHandle({
+        height: textViewHeight
+    });
+
     React.useEffect(() => {
         // auto scroll to end
-        if (textViewcontainerRef.current && textViewRef.current) {
-            const totalLines = (messages?.length ?? 0) + (status?.length ?? 0);
-            if (totalLines > mutableState.current.lastTotalLines) {
-                textViewcontainerRef.current.scrollTop = textViewRef.current.scrollHeight;
-                mutableState.current.lastTotalLines = totalLines;
-            }
+        const totalLines = (messages?.length ?? 0) + (status?.length ?? 0);
+        if (totalLines > mutableState.current.lastTotalLines) {
+            terminalOutputHandle.methods.scrollToEnd();
+            mutableState.current.lastTotalLines = totalLines;
         }
-    }, [messages, textViewRef, textViewcontainerRef, status, mutableState]);
+    }, [messages, status, mutableState, terminalOutputHandle.methods]);
 
     React.useEffect(() => {
         if (!confirmationRequired) {
@@ -194,33 +185,45 @@ export function LiveBashPanel(props: Props) {
         });
     }, [onEvent]);
 
+
     return (
         <div className={classes.container}>
-            <Toolbar isRunning={isRunning} onStopClick={onStopClicked}/>
-            <ConfirmationDialog {...confirmationDialogProps}/>
+            <Toolbar isRunning={isRunning} onStopClick={onStopClicked} page={page} setPage={setPage}/>
+            {
+                page === Page.TerminalPage && (
+                    <ConfirmationDialog {...confirmationDialogProps}/>
+                )
+            }
             <LoadingSpinner isRunning={isRunning}/>
-            <div style={{height: textViewHeight}} className={classes.textViewContainer} ref={textViewcontainerRef}>
-                <div className={classes.textView} ref={textViewRef}>
-                    <>
-                        {
-                    messages?.map((message, index) => (
-                        <p key={`msg-${index}`}>{message}</p>
-                    )) ?? ""
-                        }
-                    </>
-                    {
-                        statusHeader && (
-                            <div className={classes.statusHeader}>{statusHeader}</div>
-                        )
+            <ScrollablePane {...terminalOutputHandle.props} key={page}>
+                <TextView key={page}>
+                    {                    
+                        page === Page.TerminalPage ? (
+                            <>
+                                {
+                                    messages?.map((message, index) => (
+                                        <p key={`msg-${index}`}>{message}</p>
+                                    )) ?? ""
+                                }
+                                {
+                                    statusHeader && (
+                                        <div className={classes.statusHeader}>{statusHeader}</div>
+                                    )
+                                }
+                                {
+                                    status?.map((message, index) => (
+                                        <p key={`status-${index}`}>{message}</p>
+                                    )) ?? ""
+                                }
+                            </>
+                        ): page === Page.CodePage ? (
+                            <>
+                                {script}
+                            </>
+                        ): null
                     }
-                    {
-                    status?.map((message, index) => (
-                        <p key={`status-${index}`}>{message}</p>
-                    )) ?? ""
-                    }
-                </div>
-
-            </div>
+                </TextView>
+            </ScrollablePane>
         </div>
     );
 }

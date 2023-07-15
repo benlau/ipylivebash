@@ -1,13 +1,13 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { LiveBashPanel, useLiveBashPanel } from "./LiveBashPanel"
+import { LiveBashPanel, useLiveBashPanelHandle } from "./LiveBashPanel"
 import {JssProvider, SheetsRegistry } from "react-jss"
 import {LiveBashPanelRenderer as _LiveBashPanelRenderer} from "./LiveBashPanelRenderer";
 
 export const LiveBashPanelRenderer = _LiveBashPanelRenderer;
 
 interface Delegate {
-    methods?: ReturnType<typeof useLiveBashPanel>["methods"];
+    methods?: ReturnType<typeof useLiveBashPanelHandle>["methods"];
     onReady: () => void;
 }
 
@@ -82,7 +82,7 @@ function Controller(props: ControllerProps) {
     const {
         props: liveBashPanelProps,
         methods: liveBashPanelMethods
-    } = useLiveBashPanel({onEvent});
+    } = useLiveBashPanelHandle({onEvent});
 
     delegate.methods = liveBashPanelMethods;
 

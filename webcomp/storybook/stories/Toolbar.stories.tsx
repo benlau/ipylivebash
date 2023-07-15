@@ -1,5 +1,6 @@
 import { Toolbar } from '../../src/Toolbar';
 import React from 'react';
+import { Page } from '../../src/types';
 
 export default {
     title: 'Toolbar',
@@ -11,12 +12,17 @@ export default {
 };
 
 export const ToolbarStory = (args) => {
-    const onClick = () => {
-        // do nothing
+    const onStopClick = () => {
+        // Do nothing
     }
 
+    const [page, setPage] = React.useState(Page.TerminalPage);
+
     return (
-        <Toolbar onStopClick={onClick} onPlayClick={onClick} {...args} />
+        <Toolbar onStopClick={onStopClick} 
+            page={page}
+            setPage={setPage}
+            {...args} />
     );
 }
 

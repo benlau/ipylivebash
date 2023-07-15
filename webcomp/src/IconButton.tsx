@@ -5,9 +5,7 @@ const useStyles = createUseStyles({
     container: {
         width: 24,
         height: 24,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "relative",
         borderRadius: 4,
         cursor: "pointer",
         userSelect: "none",
@@ -22,14 +20,32 @@ const useStyles = createUseStyles({
         "&[disabled]": {
             pointerEvents: "none",
             opacity: 0.5,
-        }
+        },
+        "& img": {
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+        },
     },
+    selectedBar: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 2,
+        opacity: 1,
+        margin: "0px 2px",
+        backgroundColor: "#000",
+        zIndex: 1,
+    }
 }, {name: "IconButton"});
 
 export function IconButton(props: {
     icon: any;
     isDisabled?: boolean;
-    onClick: () => void;
+    isSelected?: boolean;
+    onClick?: () => void;
 }) {
     const classes = useStyles();
 
@@ -43,10 +59,12 @@ export function IconButton(props: {
                 return;
             }
             ev.stopPropagation();
-            props.onClick();
+            props?.onClick();
         },
         [props]
     );
+
+    const isSelected = props.isSelected ?? false;
 
     return (
         <div
@@ -55,6 +73,9 @@ export function IconButton(props: {
             disabled={props.isDisabled ?? false}
         >
             <img src={src} alt="" width={12} height={12} />
+            {
+                isSelected && (<div className={classes.selectedBar}></div>)
+            }
         </div>
     );
 }

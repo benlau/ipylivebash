@@ -1,10 +1,10 @@
 import ReactDOM from "react-dom/client"
-import { LiveBashPanel, useLiveBashPanel } from "./LiveBashPanel";
+import { LiveBashPanel, useLiveBashPanelHandle } from "./LiveBashPanel";
 import React from "react";
 
 
 interface Delegate {
-    methods?: ReturnType<typeof useLiveBashPanel>["methods"];
+    methods?: ReturnType<typeof useLiveBashPanelHandle>["methods"];
     onEvent: (event: any) => void;
     onReady: () => void;
 }
@@ -26,7 +26,7 @@ function Controller(props: ControllerProps) {
     const {
         props: liveBashPanelProps,
         methods: liveBashPanelMethods
-    } = useLiveBashPanel({onEvent});
+    } = useLiveBashPanelHandle({onEvent});
 
     delegate.methods = liveBashPanelMethods;
 
@@ -81,6 +81,8 @@ export class LiveBashPanelRenderer {
             this.delegate.methods.sendAction(newValue);
         } else if (name === "confirmation-required") {
             this.delegate.methods.setConfirmationRequired(newValue);
+        } else if (name === "script") {
+            this.delegate.methods.setScript(newValue);
         }
     }
 }

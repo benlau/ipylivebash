@@ -25,6 +25,7 @@ export const IconButtonStory = (args) => {
 
 IconButtonStory.storyName = "IconButton";
 IconButtonStory.args = {
-    isDisabled: false
+    isDisabled: false,
+    isSelected: false
 }
 

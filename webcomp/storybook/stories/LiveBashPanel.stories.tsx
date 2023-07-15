@@ -1,5 +1,6 @@
-import { LiveBashPanel, useLiveBashPanel } from '../../src/LiveBashPanel';
+import { LiveBashPanel, useLiveBashPanelHandle } from '../../src/LiveBashPanel';
 import React from 'react';
+import { Page } from '../../src/types';
 
 export default {
     title: 'LiveBashPanel',
@@ -13,7 +14,7 @@ export default {
 export const LiveBashPanelDefaultStory = (args) => {
     const {
         props,
-    } = useLiveBashPanel();
+    } = useLiveBashPanelHandle();
 
     return <LiveBashPanel {...props} {...args} />
 }
@@ -25,7 +26,7 @@ LiveBashPanelDefaultStory.args = {
 export const LiveBashPanelMessageOnlyStory = (args) => {
     const {
         props,
-    } = useLiveBashPanel();
+    } = useLiveBashPanelHandle();
 
     return <LiveBashPanel {...props} {...args} />
 }
@@ -41,7 +42,7 @@ LiveBashPanelMessageOnlyStory.args = {
 export const LiveBashPanelMaxHeightStory = (args) => {
     const {
         props,
-    } = useLiveBashPanel();
+    } = useLiveBashPanelHandle();
 
     return <LiveBashPanel {...props} {...args} />
 }
@@ -56,7 +57,7 @@ LiveBashPanelMaxHeightStory.args = {
 export const LiveBashPanelLongMessageStory = (args) => {
     const {
         props,
-    } = useLiveBashPanel();
+    } = useLiveBashPanelHandle();
 
     return <LiveBashPanel {...props} {...args}/>
 }
@@ -74,7 +75,7 @@ LiveBashPanelLongMessageStory.args = {
 export const LiveBashPanelConfirmationStory = (args) => {
     const {
         props,
-    } = useLiveBashPanel();
+    } = useLiveBashPanelHandle();
 
     return <LiveBashPanel {...props} {...args}/>
 }
@@ -82,4 +83,20 @@ export const LiveBashPanelConfirmationStory = (args) => {
 LiveBashPanelConfirmationStory.storyName = "LiveBashPanel(Confirmation Dialog Visible)";
 LiveBashPanelConfirmationStory.args = {
     confirmationRequired: true
+}
+
+
+export const LiveBashPanelScriptPageStory = (args) => {
+    const {
+        props,
+    } = useLiveBashPanelHandle();
+
+    return <LiveBashPanel {...props} {...args} page={Page.CodePage}/>
+}
+
+LiveBashPanelScriptPageStory.storyName = "LiveBashPanel(Script)";
+LiveBashPanelScriptPageStory.args = {
+    script: `
+    echo 123;
+    `
 }

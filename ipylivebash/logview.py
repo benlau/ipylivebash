@@ -24,7 +24,13 @@ class LogView(DOMWidget):
     _view_module_version = Unicode(module_version).tag(sync=True)
 
     session_id = Unicode("").tag(sync=True)
+
+    # Latest messages
     messages = Any([]).tag(sync=True)
+
+    # The script for the current session
+    script = Unicode("").tag(sync=True)
+
     status_header = Unicode("").tag(sync=True)
     status = Any([]).tag(sync=True)
     height = Int(0).tag(sync=True)
