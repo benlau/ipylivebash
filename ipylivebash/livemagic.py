@@ -1,12 +1,5 @@
 from IPython.display import display
-import subprocess
 import argparse
-import sys
-import time
-import threading
-import json
-from .logview import LogView
-from .logfile import LogFile
 from .sessionmanager import SessionManager
 
 
@@ -19,7 +12,7 @@ class LiveMagic:
         parser = argparse.ArgumentParser(prog="livebash", add_help=False)
         parser.add_argument("-h", "--help", action="store_true", dest="print_help")
         parser.add_argument(
-            "-ls", "--list-session", action="store_true", dest="list_session"
+            "-ps", "--print-sessions", action="store_true", dest="print_sessions"
         )
         parser.add_argument(
             "--save", dest="output_file", type=str, help="Save output to a file"
@@ -40,7 +33,7 @@ class LiveMagic:
         parser.add_argument(
             "--height",
             dest="height",
-            default=4,
+            default=10,
             type=int,
             help="Set the height of the output cell (no. of line)",
         )

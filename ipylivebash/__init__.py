@@ -80,7 +80,7 @@ if in_notebook():
             live_magic.parser.print_help()
             return
 
-        if live_magic.args.list_session:
+        if live_magic.args.print_sessions:
             session_manager = SessionManager.get_instance()
             session_manager.print_sessions()
             return
