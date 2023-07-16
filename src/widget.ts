@@ -109,16 +109,8 @@ export class LogView extends DOMWidgetView {
       this.onConfirmationRequiredChanged,
       this
     );
-    this.model.on(
-      'change:sessions',
-      this.onSessionsChanged,
-      this
-    )
-    this.model.on(
-      'change:session_id',
-      this.onSessionIdChanged,
-      this
-    )
+    this.model.on('change:sessions', this.onSessionsChanged, this);
+    this.model.on('change:session_id', this.onSessionIdChanged, this);
   }
 
   messagesChanged() {
@@ -173,8 +165,11 @@ export class LogView extends DOMWidgetView {
 
   onNotificationMessageChanged() {
     const value = this.model.get('notification_message');
+    if (value?.message === undefined) {
+      return;
+    }
     const notification = new Notification('livebash', {
-      body: value,
+      body: value.message,
       /* requireInteraction true is not working in Mac */
     });
     notification.onclick = (e) => {

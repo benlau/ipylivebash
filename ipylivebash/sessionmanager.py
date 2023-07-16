@@ -31,6 +31,7 @@ class SessionManager:
         self.next_id = 1
         self.max_completed_session = max_completed_session
         self.views = []
+        self.notification_id = 1
 
     def refresh_sessions(self):
         stored_finished_session = 0
@@ -245,13 +246,19 @@ class SessionManager:
             session.log_file.close()
 
         if session.args.send_notification is True:
-            self.set_view_property(
-                session_id, "notification_message", "The script is finished"
-            )
+            self.send_notification(session.id, "The script is finished")
         if session.state is not SessionState.ForceTerminated:
             session.state = SessionState.Completed
 
         self.refresh_sessions()
+
+    def send_notification(self, session_id, message):
+        payload = {"id": self.notification_id, "message": message}
+        self.notification_id = self.notification_id + 1
+        for view in self.views:
+            if view.session_id == session_id:
+                setattr(view, "notification_message", payload)
+                break
 
     def find_session(self, id):
         for session in self.sessions:

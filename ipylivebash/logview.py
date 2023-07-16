@@ -40,7 +40,7 @@ class LogView(DOMWidget):
     notification_permission_request = Bool(False).tag(sync=True)
     notification_permission = Unicode(UNKNOWN).tag(sync=True)
 
-    notification_message = Unicode("").tag(sync=True)
+    notification_message = Any({}).tag(sync=True)
 
     response = Unicode("").tag(sync=True)
     action = Unicode("").tag(sync=True)
