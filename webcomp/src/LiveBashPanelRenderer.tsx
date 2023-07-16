@@ -83,6 +83,10 @@ export class LiveBashPanelRenderer {
             this.delegate.methods.setConfirmationRequired(newValue);
         } else if (name === "script") {
             this.delegate.methods.setScript(newValue);
+        } else if (name === "sessions") {
+            this.delegate.methods.setSessions(newValue);
+        } else if (name === "session-id") {
+            this.delegate.methods.setSessionId(newValue)
         }
     }
 }

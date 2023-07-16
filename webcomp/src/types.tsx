@@ -1,5 +1,11 @@
 
 export enum Page {
     TerminalPage,
-    CodePage
+    CodePage,
+    SessionPage
+}
+
+export interface Session {
+    id: string;
+    state: string;
 }

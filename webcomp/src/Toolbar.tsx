@@ -2,6 +2,7 @@ import React from "react";
 import stopIcon from "./assets/stop-solid.svg";
 import codeIcon from "./assets/code-solid.svg";
 import terminalIcon from "./assets/terminal-solid.svg";
+import listIcon from "./assets/list-solid.svg";
 
 import {IconButton} from "./IconButton";
 import {createUseStyles} from "react-jss";
@@ -38,11 +39,16 @@ export function Toolbar(props: Props) {
         setPage(Page.CodePage);
     }, [setPage]);
 
+    const onSessionClick = React.useCallback(() => {
+        setPage(Page.SessionPage);
+    }, [setPage]);
+
     return (
         <div className={classes.container}>
             <IconButton icon={stopIcon} onClick={onStopClick} isDisabled={!isRunning}/>
             <IconButton icon={terminalIcon} isSelected={page === Page.TerminalPage} onClick={onTerminalClick} />
             <IconButton icon={codeIcon} isSelected={page === Page.CodePage} onClick={onCodeClick}/>
+            <IconButton icon={listIcon} isSelected={page === Page.SessionPage} onClick={onSessionClick}/>
         </div>
     )
 }

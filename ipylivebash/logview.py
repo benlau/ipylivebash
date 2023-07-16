@@ -45,6 +45,8 @@ class LogView(DOMWidget):
     response = Unicode("").tag(sync=True)
     action = Unicode("").tag(sync=True)
 
+    sessions = Any([]).tag(sync=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.submitted_count = 0

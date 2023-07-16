@@ -4,8 +4,9 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { Toolbar }  from './Toolbar';
 import { useConfirmationDialog, ConfirmationDialog } from './ConfirmationDialog';
 import { ScrollablePane, useScrollablePaneHandle } from './ScrollablePane';
-import { Page } from "./types";
+import { Page, Session } from "./types";
 import { TextView } from "./TextView";
+import { SessionTable} from "./SessionTable";
 
 enum ActionType {
     askRunConfirmation = "askRunConfirmation"
@@ -37,6 +38,8 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
     const [confirmationRequired, setConfirmationRequired] = React.useState<boolean>(false);
     const [script, setScript] = React.useState<string>("");
     const [page, setPage] = React.useState<Page>(Page.TerminalPage);
+    const [sessions, setSessions] = React.useState<Session[]>([]);
+    const [sessionId, setSessionId] = React.useState<string>("");
 
     const onEvent = defaultValues?.onEvent;
 
@@ -101,7 +104,9 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
         mutableState,
         page,
         setPage,
-        script
+        script,
+        sessions,
+        sessionId
     }), [messages, status, statusHeader, isRunning, 
         heightInLines,
         confirmationDialogProps, onEvent,
@@ -109,6 +114,8 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
         mutableState, 
         page, 
         setPage,
+        sessions,
+        sessionId,
         script]);
 
     const methods = React.useMemo(() => ({
@@ -123,9 +130,11 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
         setConfirmationRequired,
         clear,
         setScript,
+        setSessions,
+        setSessionId
     }), [log, setStatus, setStatusHeader, setIsRunning,
         setMessages, setHeightInLines, askRunConfirmation, sendAction
-        , setConfirmationRequired, clear, setScript]);
+        , setConfirmationRequired, clear, setScript, setSessions, setSessionId]);
 
     return React.useMemo(() => ({
         props,
@@ -152,7 +161,9 @@ export function LiveBashPanel(props: Props) {
         mutableState,
         page,
         setPage,
-        script
+        script,
+        sessions,
+        sessionId
     } = props;
     const classes = useStyles();
 
@@ -196,9 +207,9 @@ export function LiveBashPanel(props: Props) {
             }
             <LoadingSpinner isRunning={isRunning}/>
             <ScrollablePane {...terminalOutputHandle.props} key={page}>
-                <TextView key={page}>
-                    {                    
-                        page === Page.TerminalPage ? (
+                {                    
+                    page === Page.TerminalPage ? (
+                        <TextView key={page}>
                             <>
                                 {
                                     messages?.map((message, index) => (
@@ -216,13 +227,17 @@ export function LiveBashPanel(props: Props) {
                                     )) ?? ""
                                 }
                             </>
-                        ): page === Page.CodePage ? (
+                        </TextView>
+                    ): page === Page.CodePage ? (
+                        <TextView key={page}>
                             <>
                                 {script}
                             </>
-                        ): null
-                    }
-                </TextView>
+                        </TextView>
+                    ): page === Page.SessionPage ? (
+                        <SessionTable rows={sessions} activeSessionId={sessionId}/>
+                    ): null
+                }
             </ScrollablePane>
         </div>
     );

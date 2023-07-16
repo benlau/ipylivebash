@@ -48,6 +48,16 @@ class SessionManager:
         self.sessions = list(filter(predicate, self.sessions))
         self.sessions.reverse()
 
+        sessions = [
+            {
+                "id": session.id,
+                "state": session.state.value,
+            }
+            for session in self.sessions
+        ]
+
+        self.set_all_view_property("sessions", sessions)
+
     def print_sessions(self):
         headers = ["Session ID", "State"]
         rows = [[session.id, session.state.value] for session in self.sessions]
@@ -61,8 +71,7 @@ class SessionManager:
         return session
 
     def create_view(self, session):
-        view = LogView()
-        view.session_id = session.id
+        view = LogView(session_id=session.id)
         self.views.append(view)
         return view
 
@@ -89,6 +98,7 @@ class SessionManager:
         view = self.create_view(session)
         self.set_view_property(session_id, "height", args.height)
         self.set_view_property(session_id, "script", session.script)
+        self.refresh_sessions()
 
         if args.ask_confirm is True:
             self.set_view_property(session_id, "confirmation_required", True)
@@ -154,6 +164,7 @@ class SessionManager:
 
         self.set_view_property(session_id, "running", True)
         session.state = SessionState.Running
+        self.refresh_sessions()
 
         def output(message):
             self.write_message(session_id, message)
@@ -204,6 +215,10 @@ class SessionManager:
             if view.session_id == session_id:
                 setattr(view, key, value)
 
+    def set_all_view_property(self, key, value):
+        for view in self.views:
+            setattr(view, key, value)
+
     def on_session_finished(self, session_id, exit_code):
         session = self.find_session(session_id)
         if session is None:
@@ -235,6 +250,8 @@ class SessionManager:
             )
         if session.state is not SessionState.ForceTerminated:
             session.state = SessionState.Completed
+
+        self.refresh_sessions()
 
     def find_session(self, id):
         for session in self.sessions:

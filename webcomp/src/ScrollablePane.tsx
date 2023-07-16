@@ -5,7 +5,7 @@ const useStyles = createUseStyles({
     container: {
         "overflow-y": "auto",
     },
-});
+}, {name: "ScrollablePane"});
 
 interface HandleArgs {
     height?: string;

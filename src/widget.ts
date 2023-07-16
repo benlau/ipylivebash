@@ -23,6 +23,8 @@ export class LogViewModel extends DOMWidgetModel {
       height: 0,
       status: [],
       running: false,
+      session_id: '',
+      sessions: '',
       notification_permission_request: false,
       notification_permission: '',
       notification_message: '',
@@ -63,11 +65,16 @@ export class LogView extends DOMWidgetView {
       const heightInLines = parseInt(this.model.get('height'));
       const confirmationRequired = this.model.get('confirmation_required');
       const script = this.model.get('script');
+      const sessions = this.model.get('sessions');
+      const sessionId = this.model.get('session_id');
 
+      //@FIXME - Deprecate setAttribute function
       this.renderer.setAttribute('is-running', isRunning);
       this.renderer.setAttribute('height-in-lines', heightInLines);
       this.renderer.setAttribute('confirmation-required', confirmationRequired);
       this.renderer.setAttribute('script', script);
+      this.renderer.setAttribute('sessions', sessions);
+      this.renderer.setAttribute('session-id', sessionId);
     };
 
     this.renderer = new LiveBashPanelRenderer(panel, onEvent, onReady);
@@ -102,6 +109,16 @@ export class LogView extends DOMWidgetView {
       this.onConfirmationRequiredChanged,
       this
     );
+    this.model.on(
+      'change:sessions',
+      this.onSessionsChanged,
+      this
+    )
+    this.model.on(
+      'change:session_id',
+      this.onSessionIdChanged,
+      this
+    )
   }
 
   messagesChanged() {
@@ -189,5 +206,15 @@ export class LogView extends DOMWidgetView {
   onActionChanged() {
     const value = this.model.get('action');
     this.renderer.setAttribute('action', value);
+  }
+
+  onSessionsChanged() {
+    const value = this.model.get('sessions');
+    this.renderer.setAttribute('sessions', value);
+  }
+
+  onSessionIdChanged() {
+    const value = this.model.get('session_id');
+    this.renderer.setAttribute('session-id', value);
   }
 }
