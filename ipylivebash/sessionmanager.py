@@ -7,6 +7,8 @@ from IPython.display import display
 import time
 import json
 from tabulate import tabulate
+from IPython import get_ipython
+
 
 instance = None
 
@@ -32,6 +34,14 @@ class SessionManager:
         self.max_completed_session = max_completed_session
         self.views = []
         self.notification_id = 1
+        self.current_cell_id = None
+
+    def _on_pre_run_cell(self, info):
+        self.current_cell_id = info.cell_id
+
+    def start(self):
+        ip = get_ipython()
+        ip.events.register("pre_run_cell", self._on_pre_run_cell)
 
     def refresh_sessions(self):
         stored_finished_session = 0
@@ -67,12 +77,17 @@ class SessionManager:
     def create_session(self):
         session = Session()
         session.id = f"instance{left_pad(str(self.next_id), 4, '0')}"
+        session.cell_id = self.current_cell_id
+        self.current_cell_id = None
         self.next_id = self.next_id + 1
         self.sessions.append(session)
         return session
 
     def create_view(self, session):
-        view = LogView(session_id=session.id)
+        view = LogView(session_id=session.id, cell_id=session.cell_id)
+        for v in self.views:
+            if v.cell_id == view.cell_id:
+                self.views.remove(v)
         self.views.append(view)
         return view
 
@@ -93,16 +108,15 @@ class SessionManager:
         self.refresh_sessions()
 
     def run_session_with_view(self, session, args):
-        session_id = session.id
         session.args = args
 
         view = self.create_view(session)
-        self.set_view_property(session_id, "height", args.height)
-        self.set_view_property(session_id, "script", session.script)
+        self.set_view_property(session, "height", args.height)
+        self.set_view_property(session, "script", session.script)
         self.refresh_sessions()
 
         if args.ask_confirm is True:
-            self.set_view_property(session_id, "confirmation_required", True)
+            self.set_view_property(session, "confirmation_required", True)
 
         def on_response(change):
             self.on_response(view.session_id, change)
@@ -163,7 +177,7 @@ class SessionManager:
     def execute_process(self, session, next):
         session_id = session.id
 
-        self.set_view_property(session_id, "running", True)
+        self.set_view_property(session, "running", True)
         session.state = SessionState.Running
         self.refresh_sessions()
 
@@ -211,9 +225,9 @@ class SessionManager:
             if view.session_id == session_id:
                 view.flush()
 
-    def set_view_property(self, session_id, key, value):
+    def set_view_property(self, session, key, value):
         for view in self.views:
-            if view.session_id == session_id:
+            if view.cell_id == session.cell_id:
                 setattr(view, key, value)
 
     def set_all_view_property(self, key, value):
@@ -240,7 +254,7 @@ class SessionManager:
         for message in pending_messages:
             self.write_message(session_id, message)
         self.flush(session_id)
-        self.set_view_property(session_id, "running", False)
+        self.set_view_property(session, "running", False)
 
         if session.log_file is not None:
             session.log_file.close()

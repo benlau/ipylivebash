@@ -25,6 +25,8 @@ class LogView(DOMWidget):
 
     session_id = Unicode("").tag(sync=True)
 
+    cell_id = Unicode("").tag(sync=False)
+
     # Latest messages
     messages = Any([]).tag(sync=True)
 

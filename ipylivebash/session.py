@@ -23,6 +23,7 @@ class Session:
         self.args = None
         self.process_finish_messages = []
         self.exit_code = None
+        self.cell_id = None
 
         # next function to be involved
         self.next = None

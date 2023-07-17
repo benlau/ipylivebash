@@ -4,7 +4,6 @@
 # Copyright (c) Ben lau.
 # Distributed under the terms of the Modified BSD License.
 
-from .logview import LogView  # noqa
 from ._version import __version__  # noqa
 from IPython.core.magic import register_cell_magic
 from .sessionmanager import SessionManager, run_script  # noqa
@@ -71,6 +70,8 @@ def in_notebook():
 
 
 if in_notebook():
+    session_manager = SessionManager.get_instance()
+    session_manager.start()
 
     @register_cell_magic
     def livebash(line, cell):
@@ -81,7 +82,6 @@ if in_notebook():
             return
 
         if live_magic.args.print_sessions:
-            session_manager = SessionManager.get_instance()
             session_manager.print_sessions()
             return
 
