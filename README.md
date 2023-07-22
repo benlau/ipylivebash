@@ -1,7 +1,17 @@
 # ipylivebash
 
-ipylivebash is a library to run shell script in Jupyter with live output.
-It is designed as a utility to use Jupyter as a DevOps management tool.
+The ipylivebash library is a shell script runner that enhances Jupyter's capabilities, transforming it into an valuable tool within the context of DevOps.
+
+Features:
+- Live Magic: Added "%%livebash" live magic command to run shell script in Jupyter.
+- Execution Confirmation UI: Avoid accidental execution
+- Notification: Send a notification when the script finishes
+- Background Process Management: Show and kill background process
+- Logging: Log output to a file with/without timestamp information
+
+![screenshot1.png](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/screenshot1.png)
+
+![ask_confirm.png](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/ask_confirm.png)
 
 **Example**
 
@@ -11,7 +21,8 @@ It is designed as a utility to use Jupyter as a DevOps management tool.
 find .
 ```
 
-Run `find .` and show the output in the Jupyter notebook and also save to log-${current_timestamp}.txt
+Run `find .` and show the output in the Jupyter notebook, and also save it to log-${current_timestamp}.txt.
+
 
 ```
 %%livebash --ask-confirm --notify
@@ -19,7 +30,9 @@ set -e
 deploy_script
 ```
 
-Before running the `deploy_script` show a panel to ask for confirmation. Once it is finished, show a notification.
+Before running the `deploy_script`, show a panel to ask for confirmation. Once it is finished, inform the user with a browser notification.
+
+
 
 **Features**
 
@@ -32,20 +45,20 @@ Before running the `deploy_script` show a panel to ask for confirmation. Once it
 **Usage**
 
 ```
-usage: livebash [-h] [--save OUTPUT_FILE] [--save-timestamp]
+usage: livebash [-h] [-ps] [--save OUTPUT_FILE] [--save-timestamp]
                 [--line-limit LINE_LIMIT] [--height HEIGHT] [--ask-confirm]
-                [--notify] [--keep-cell-output]
+                [--notify]
 
-optional arguments:
+options:
   -h, --help
+  -ps, --print-sessions
   --save OUTPUT_FILE    Save output to a file
   --save-timestamp      Add timestamp to the output file name
   --line-limit LINE_LIMIT
                         Restrict the no. of lines to be shown
-  --height HEIGHT       Set the height of the output cell
+  --height HEIGHT       Set the height of the output cell (no. of line)
   --ask-confirm         Ask for confirmation before execution
   --notify              Send a notification when the script finished
-  --keep-cell-output    Keep the cell output
 ```
 
 ## Options
@@ -73,16 +86,11 @@ Set the height of the output cell
  
 Ask for confirmation before execution
 
-![ask_confirm.png (392×80)](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/ask_confirm.png)
+![ask_confirm.png](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/ask_confirm.png)
 
 **--notify**
   
 Send a notification when the script finished
-
-**--keep-cell-output**
-
-Keep the cell output such that it could be saved together with the notebook.
-It can't be used with other options like --line-limit.
 
 ## Installation
 
@@ -92,8 +100,9 @@ You can install using `pip`:
 pip install ipylivebash
 ```
 
-If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
+Remarks: If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
 the nbextension:
+
 ```bash
 jupyter nbextension enable --py [--sys-prefix|--user|--system] ipylivebash
 ```
