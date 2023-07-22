@@ -8,9 +8,16 @@ import time
 import json
 from tabulate import tabulate
 from IPython import get_ipython
+from enum import Enum
 
 
 instance = None
+
+
+class EventType(Enum):
+    RequestToStop = "RequestToStop"
+    ConfirmedToRun = "ConfirmedToRun"
+    CancelledToRun = "CancelledToRun"
 
 
 async def run_script(script):
@@ -283,16 +290,21 @@ class SessionManager:
         try:
             response = json.loads(change.new)
             content = json.loads(response["content"])
-            if content["type"] == "requestToStop":
+            if content["type"] == EventType.RequestToStop.value:
                 session = self.find_session(session_id)
                 if session is not None:
                     session.process_finish_messages.append("Force terminated")
                     self.kill(session.id)
-            elif content["type"] == "confirmToRun":
+            elif content["type"] == EventType.ConfirmedToRun.value:
                 session = self.find_session(session_id)
                 next = session.next
                 session.next = None
                 next()
+            elif content["type"] == EventType.CancelledToRun.value:
+                session = self.find_session(session_id)
+                session.state = SessionState.Cancelled
+                self.refresh_sessions()
+
         except Exception as e:
             print(e)
 

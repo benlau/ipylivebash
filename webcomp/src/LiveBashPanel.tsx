@@ -4,7 +4,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { Toolbar }  from './Toolbar';
 import { useConfirmationDialog, ConfirmationDialog } from './ConfirmationDialog';
 import { ScrollablePane, useScrollablePaneHandle } from './ScrollablePane';
-import { Page, Session } from "./types";
+import { EventType, Page, Session } from "./types";
 import { TextView } from "./TextView";
 import { SessionTable} from "./SessionTable";
 
@@ -70,9 +70,10 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
             "Are you sure you want to run this script?",
             () => {
                 clear();
-                onEvent?.({type: "confirmToRun"});
+                onEvent?.({type: EventType.ConfirmedToRun});
             },() => {
-                log("Canceled");
+                onEvent?.({type: EventType.CancelledToRun});
+                log("Cancelled");
             });
     }, [confirmationDialogMethods, onEvent, clear, log]);
 
@@ -192,7 +193,7 @@ export function LiveBashPanel(props: Props) {
 
     const onStopClicked = React.useCallback(() => {
         onEvent?.({
-            type: "requestToStop",
+            type: EventType.RequestToStop,
         });
     }, [onEvent]);
 

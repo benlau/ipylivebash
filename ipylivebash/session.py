@@ -6,6 +6,7 @@ SHELL = "/bin/bash"
 
 class SessionState(Enum):
     NotStarted = "NotStarted"
+    Cancelled = "Cancelled"
     Running = "Running"
     Completed = "Completed"
     ForceTerminated = "ForceTerminated"
@@ -41,4 +42,5 @@ class Session:
         return (
             self.state == SessionState.Completed
             or self.state == SessionState.ForceTerminated
+            or self.state == SessionState.Cancelled
         )

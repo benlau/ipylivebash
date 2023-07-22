@@ -9,3 +9,9 @@ export interface Session {
     id: string;
     state: string;
 }
+
+export enum EventType {
+    RequestToStop = "RequestToStop",
+    ConfirmedToRun = "ConfirmedToRun",
+    CancelledToRun = "CancelledToRun"
+}
