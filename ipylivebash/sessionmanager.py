@@ -15,7 +15,7 @@ instance = None
 
 
 class EventType(Enum):
-    RequestToStop = "RequestToStop"
+    RequestToKill = "RequestToKill"
     ConfirmedToRun = "ConfirmedToRun"
     CancelledToRun = "CancelledToRun"
 
@@ -290,11 +290,12 @@ class SessionManager:
         try:
             response = json.loads(change.new)
             content = json.loads(response["content"])
-            if content["type"] == EventType.RequestToStop.value:
-                session = self.find_session(session_id)
+            if content["type"] == EventType.RequestToKill.value:
+                target_session_id = content["target_session_id"]
+                session = self.find_session(target_session_id)
                 if session is not None:
                     session.process_finish_messages.append("Force terminated")
-                    self.kill(session.id)
+                    self.kill(target_session_id)
             elif content["type"] == EventType.ConfirmedToRun.value:
                 session = self.find_session(session_id)
                 next = session.next

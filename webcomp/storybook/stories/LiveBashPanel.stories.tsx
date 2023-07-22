@@ -100,3 +100,26 @@ LiveBashPanelScriptPageStory.args = {
     echo 123;
     `
 }
+
+
+export const LiveBashPanelSessionPageStory = (args) => {
+    const {
+        props,
+    } = useLiveBashPanelHandle();
+
+    return <LiveBashPanel {...props} {...args} page={Page.SessionPage}/>
+}
+
+LiveBashPanelSessionPageStory.storyName = "LiveBashPanel(Session)";
+LiveBashPanelSessionPageStory.args = {
+    sessions: [
+        {
+            id: "instance0001",
+            state: "Completed"
+        },
+        {
+            id: "instance0002",
+            state: "Running"
+        },
+    ]
+}

@@ -10,8 +10,12 @@ export interface Session {
     state: string;
 }
 
+export enum SessionState {
+    Running = "Running",
+}
+
 export enum EventType {
-    RequestToStop = "RequestToStop",
+    RequestToKill = "RequestToKill",
     ConfirmedToRun = "ConfirmedToRun",
     CancelledToRun = "CancelledToRun"
 }

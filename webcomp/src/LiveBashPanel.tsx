@@ -65,6 +65,15 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
         setStatus([]);
     }, [mutableState, setMessages, setStatusHeader, setStatus]);
 
+    const killSession = React.useCallback((targetSessionId: string) => {
+        onEvent?.({type: EventType.RequestToKill,
+            target_session_id: targetSessionId});
+    }, [onEvent]);
+
+    const killActiveSession = React.useCallback(() => {
+        killSession(sessionId);
+    }, [sessionId, killSession]);
+
     const askRunConfirmation = React.useCallback(() => {
         confirmationDialogMethods.show(
             "Are you sure you want to run this script?",
@@ -107,7 +116,9 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
         setPage,
         script,
         sessions,
-        sessionId
+        sessionId,
+        killActiveSession,
+        killSession
     }), [messages, status, statusHeader, isRunning, 
         heightInLines,
         confirmationDialogProps, onEvent,
@@ -117,6 +128,8 @@ export function useLiveBashPanelHandle(defaultValues?: useLiveBashPanelDefaults)
         setPage,
         sessions,
         sessionId,
+        killActiveSession,
+        killSession,
         script]);
 
     const methods = React.useMemo(() => ({
@@ -155,7 +168,6 @@ export function LiveBashPanel(props: Props) {
         statusHeader,
         isRunning,
         heightInLines,
-        onEvent,
         confirmationDialogProps,
         confirmationRequired,
         askRunConfirmation,
@@ -164,7 +176,9 @@ export function LiveBashPanel(props: Props) {
         setPage,
         script,
         sessions,
-        sessionId
+        sessionId,
+        killActiveSession,
+        killSession
     } = props;
     const classes = useStyles();
 
@@ -192,10 +206,8 @@ export function LiveBashPanel(props: Props) {
     }, [confirmationRequired]);
 
     const onStopClicked = React.useCallback(() => {
-        onEvent?.({
-            type: EventType.RequestToStop,
-        });
-    }, [onEvent]);
+        killActiveSession();
+    }, [killActiveSession]);
 
 
     return (
@@ -236,7 +248,8 @@ export function LiveBashPanel(props: Props) {
                             </>
                         </TextView>
                     ): page === Page.SessionPage ? (
-                        <SessionTable rows={sessions} activeSessionId={sessionId}/>
+                        <SessionTable rows={sessions} activeSessionId={sessionId}
+                            killSession={killSession}/>
                     ): null
                 }
             </ScrollablePane>

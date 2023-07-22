@@ -1,6 +1,8 @@
 import React from 'react';
 import {createUseStyles} from "react-jss";
-import {Session} from "./types";
+import {Session, SessionState} from "./types";
+import stopIcon from "./assets/stop-solid.svg";
+import {IconButton} from "./IconButton";
 
 const useStyles = createUseStyles({
     container: {
@@ -17,34 +19,38 @@ const useStyles = createUseStyles({
     header: {
         backgroundColor: '#edebe9',
         fontWeight: 600,
-        fontSize: '10px',
-        padding: "2px",
+        fontSize: '14px',
+        padding: "4px 8px",
 
     },
     row: {
         display: "contents",
-        fontSize: '10px',
+        fontSize: '14px',
         lineHeight: '20px',
         "& > div": {
-            padding: "2px",
+            padding: "4px 4px",
             backgroundColor: '#fff',    
         },
         "&:hover > div": {
-            padding: "2px",
             backgroundColor: '#ffffff1f',
         },
     },
     activeRow: {
         display: "contents",
-        fontSize: '10px',
+        fontSize: '14px',
         lineHeight: '20px',
         "& > div": {
-            padding: "2px",
+            padding: "4px 4px",
             backgroundColor: '#d9f4d7',
         },
         "&:hover > div": {
             backgroundColor: '#d9f4d77f',
         }
+    },
+    spaceBetween: {
+        display: "flex",
+        justifyContent: "space-between",
+        flexDisplay: "row"
     }
 },
 {name: "SessionTable"}
@@ -54,23 +60,35 @@ interface RowProps {
     id: string;
     state: string;
     isActive: boolean;
+    killSession: (sessionId: string) => void;
 }
 
 function Row(props: RowProps) {
     const {
         id,
         state,
-        isActive
+        isActive,
+        killSession
     } = props;
 
     const classes = useStyles();
 
     const className = isActive ? classes.activeRow : classes.row;
+    const onClick= React.useCallback(() => {
+        killSession(id);
+    }, [id, killSession]);
 
     return (
         <div className={className}>
             <div> {id} </div>
-            <div> {state} </div>
+            <div className={classes.spaceBetween}> 
+                <div>{state}</div>
+                {
+                    state === SessionState.Running && (
+                        <div> <IconButton icon={stopIcon} onClick={onClick}/> </div>
+                    )
+                }
+            </div>
         </div>
     )
 }
@@ -78,12 +96,14 @@ function Row(props: RowProps) {
 interface SessionTableProps {
     activeSessionId?: string;
     rows: Session[];
+    killSession: (sessionId: string) => void;
 }
 
 export function SessionTable(props: SessionTableProps) {
     const {
         rows,
-        activeSessionId
+        activeSessionId,
+        killSession
     } = props;
     const classes = useStyles();
 
@@ -94,7 +114,8 @@ export function SessionTable(props: SessionTableProps) {
                 <div className={classes.header}> State </div>
                 {rows.map((row, index) => {
                     return (
-                        <Row key={`row-${index}`} id={row.id} state={row.state} isActive={row.id === activeSessionId}/>
+                        <Row key={`row-${index}`} id={row.id} state={row.state} isActive={row.id === activeSessionId}
+                            killSession={killSession}/>
                     )})}
             </div>
         </div>
