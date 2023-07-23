@@ -8,12 +8,17 @@ Features:
 - Notification: Send a notification when the script finishes
 - Background Process Management: Show and kill background process
 - Logging: Log output to a file with/without timestamp information
+- Python API: For running script easily
+
+## Screenshots
 
 ![screenshot1.png](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/screenshot1.png)
 
+Execution Confirmation
+
 ![ask_confirm.png](https://raw.githubusercontent.com/benlau/ipylivebash/main/docs/img/ask_confirm.png)
 
-**Example**
+## Example
 
 ```
 %%livebash --save log.txt --save-timestamp
@@ -32,17 +37,7 @@ deploy_script
 
 Before running the `deploy_script`, show a panel to ask for confirmation. Once it is finished, inform the user with a browser notification.
 
-
-
-**Features**
-
-1. Run shell script in Jupyter with live output
-2. The output in the notebook cell is not saved in the notebook by default
-3. Support to save the output to a file. If the file already exists, it will pick another name automatically.
-4. Support to show a confirmation UI before executing the script
-5. Support to send a notification when the script finishes.
-
-**Usage**
+# Usage
 
 ```
 usage: livebash [-h] [-ps] [--save OUTPUT_FILE] [--save-timestamp]
