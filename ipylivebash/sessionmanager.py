@@ -20,17 +20,19 @@ class EventType(Enum):
     CancelledToRun = "CancelledToRun"
 
 
-async def run_script(script):
+async def run_script(script, output=None):
     """
     Run script via Python API without UI.
     """
 
-    def output(message):
+    def def_output(message):
         print(message.strip())
 
     manager = SessionManager.get_instance()
     session = manager.create_session()
     session.script = script
+    if output is None:
+        output = def_output
     return await manager.run_session(session, output=output)
 
 
