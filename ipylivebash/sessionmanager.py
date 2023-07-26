@@ -25,15 +25,25 @@ async def run_script(script, output=None):
     Run script via Python API without UI.
     """
 
-    def def_output(message):
+    def output_to_print(message):
         print(message.strip())
+
+    def output_to_widget(message):
+        try:
+            output.append_stdout(message)
+        except Exception as e:
+            output_to_print(e)
 
     manager = SessionManager.get_instance()
     session = manager.create_session()
     session.script = script
     if output is None:
-        output = def_output
-    return await manager.run_session(session, output=output)
+        output_func = output_to_print
+    elif hasattr(output, "append_stdout"):
+        output_func = output_to_widget
+    else:
+        output_func = output
+    return await manager.run_session(session, output=output_func)
 
 
 class SessionManager:
