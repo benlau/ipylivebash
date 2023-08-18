@@ -2,7 +2,7 @@ import threading
 import subprocess
 import asyncio
 import time
-from enum import Enum
+import psutil
 
 SHELL = "/bin/bash"
 
@@ -73,6 +73,12 @@ class RunTask:
         return future
 
     def kill(self):
-        self.process.kill()
+        # Kill the process group
+        # https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true/4791612#4791612
+        process = psutil.Process(self.process.pid)
+        for proc in process.children(recursive=True):
+            proc.kill()
+        process.kill()
+
         for thread in self.threads:
             thread.join()

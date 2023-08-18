@@ -91,7 +91,8 @@ setup_args = dict(
     python_requires=">=3.6",
     install_requires=[
         'ipywidgets>=7.0.0',
-        'tabulate>=0.9.0'
+        'tabulate>=0.9.0',
+        'psutil>=5.9.5'
     ],
     extras_require={
         'test': [
