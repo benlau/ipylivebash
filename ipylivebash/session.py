@@ -29,10 +29,10 @@ class Session:
         # next function to be involved
         self.next = None
 
-    def run(self, output=print, flush=None):
+    def run(self, output=print, flush=None, env=None):
         self.task = RunTask()
         self.task.script = self.script
-        return self.task(output=output, flush=flush)
+        return self.task(output=output, flush=flush, env=env)
 
     def kill(self):
         self.task.kill()

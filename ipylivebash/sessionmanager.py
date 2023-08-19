@@ -20,7 +20,7 @@ class EventType(Enum):
     CancelledToRun = "CancelledToRun"
 
 
-async def run_script(script, output=None):
+async def run_script(script, output=None, env=None):
     """
     Run script via Python API without UI.
     """
@@ -43,7 +43,7 @@ async def run_script(script, output=None):
         output_func = output_to_widget
     else:
         output_func = output
-    return await manager.run_session(session, output=output_func)
+    return await manager.run_session(session, output=output_func, env=env)
 
 
 class SessionManager:
@@ -110,13 +110,13 @@ class SessionManager:
         self.views.append(view)
         return view
 
-    async def run_session(self, session, output=print):
+    async def run_session(self, session, output=print, env=None):
         session.args = {}
         session.state = SessionState.Running
         self.refresh_sessions()
 
         try:
-            exit_code = await session.run(output=output)
+            exit_code = await session.run(output=output, env=env)
             session.state = SessionState.Completed
             session.exit_code = exit_code
         except asyncio.CancelledError:

@@ -3,6 +3,7 @@ import subprocess
 import asyncio
 import time
 import psutil
+import os
 
 SHELL = "/bin/bash"
 
@@ -12,7 +13,7 @@ class RunTask:
         self.script = ""
         self.threads = []
 
-    def __call__(self, output=print, flush=None):
+    def __call__(self, output=print, flush=None, env=None):
         mutex = threading.Lock()
         pending_messages = []
         running = True
@@ -24,6 +25,9 @@ class RunTask:
             nonlocal pending_messages
             nonlocal loop
             nonlocal future
+            process_env = os.environ.copy()
+            if env is not None:
+                process_env.update(env)
             try:
                 process = subprocess.Popen(
                     self.script,
@@ -32,6 +36,7 @@ class RunTask:
                     shell=True,
                     universal_newlines=True,
                     executable=SHELL,
+                    env=process_env,
                 )
                 self.process = process
                 for line in process.stdout:

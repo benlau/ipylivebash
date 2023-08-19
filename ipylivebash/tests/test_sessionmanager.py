@@ -42,3 +42,24 @@ async def test_session_run_should_strip_stopped_session():
 
     assert len(manager.sessions) == 10
     assert manager.sessions[0].id == "instance0003"
+
+
+@pytest.mark.asyncio
+async def test_session_run_support_env():
+    manager = SessionManager()
+
+    messages = []
+
+    def pr(message):
+        messages.append(message)
+
+    session = manager.create_session()
+    session.script = """\
+echo $TEST_ENV
+"""
+    env = {"TEST_ENV": "123456"}
+    await manager.run_session(session, output=pr, env=env)
+
+    assert len(messages) == 1
+    assert messages[0] == "123456\n"
+    assert session.exit_code == 0
