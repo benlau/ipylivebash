@@ -10,6 +10,8 @@ include package.json
 include webpack.config.js
 include ipylivebash/labextension/*.tgz
 
+recursive-include ipylivebash/exp *.py
+
 # Documentation
 graft docs
 exclude docs/\#*
