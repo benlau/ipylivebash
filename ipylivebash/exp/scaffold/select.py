@@ -2,9 +2,10 @@ import asyncio
 import ipywidgets as widgets
 from IPython.display import display
 from ipylivebash.sessionmanager import run_script  # noqa
+from .doublebufferoutput import DoubleBufferOutput
 
 
-def _execute(script_or_callback, value, output_widget):
+def _execute(script_or_callback, value, output_widget: DoubleBufferOutput):
     if isinstance(script_or_callback, str):
         script = script_or_callback
         output_widget.clear_output()
@@ -25,7 +26,7 @@ def select(title=None, options=None, run=None, action_label="Confirm"):
 
     select_widget = widgets.Select(options=options)
     confirm_button = widgets.Button(description=action_label)
-    output_area = widgets.Output()
+    output_area = DoubleBufferOutput()
 
     def confirm_button_callback(b):
         value = select_widget.value
@@ -34,7 +35,7 @@ def select(title=None, options=None, run=None, action_label="Confirm"):
     confirm_button.on_click(confirm_button_callback)
 
     widgets_box = widgets.VBox(
-        [title_widget, select_widget, confirm_button, output_area]
+        [title_widget, select_widget, confirm_button, output_area.vbox]
     )
 
     return widgets_box
