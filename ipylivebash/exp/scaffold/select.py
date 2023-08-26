@@ -1,36 +1,27 @@
-import asyncio
 import ipywidgets as widgets
 from IPython.display import display
-from ipylivebash.sessionmanager import run_script  # noqa
 from .doublebufferoutput import DoubleBufferOutput
+from .execute import execute
 
 
-def _execute(script_or_callback, value, output_widget: DoubleBufferOutput):
-    if isinstance(script_or_callback, str):
-        script = script_or_callback
-        output_widget.clear_output()
-        env = {
-            "LIVEBASH_VALUE": value,
-        }
-        task = run_script(script, output_widget.append_stdout, env=env)
-        asyncio.get_event_loop().create_task(task)
-    elif callable(script_or_callback):
-        output_widget.clear_output()
-        script_or_callback(value, output_widget.append_stdout)
-
-
-def select(title=None, options=None, run=None, action_label="Confirm"):
+def select(title=None, options=None, run=None, value=None, action_label="Confirm"):
     title_widget = None
     if title is not None:
         title_widget = widgets.Label(value=title)
 
-    select_widget = widgets.Select(options=options)
+    if not isinstance(value, str):
+        value = str(value)
+
+    if not value in options:
+        value = options[0]
+
+    select_widget = widgets.Select(options=options, value=value)
     confirm_button = widgets.Button(description=action_label)
     output_area = DoubleBufferOutput()
 
     def confirm_button_callback(b):
         value = select_widget.value
-        _execute(run, value, output_area)
+        execute(run, value, output_area)
 
     confirm_button.on_click(confirm_button_callback)
 
@@ -41,7 +32,7 @@ def select(title=None, options=None, run=None, action_label="Confirm"):
     return widgets_box
 
 
-def display_select(title, options, run, **args):
+def display_select(title, options, run, *args, **kwargs):
     """
     Show a select widget
 
@@ -53,6 +44,6 @@ def display_select(title, options, run, **args):
     options: list
         List of options(string)
 
-    run: str or callable
+    run: str or callable or EnvVar
     """
-    display(select(title, options, run, **args))
+    display(select(title, options, run, *args, **kwargs))

@@ -12,3 +12,6 @@ class EnvVar:
     def __call__(self, value, output):
         os.environ[self.name] = value
         output(f"Set {self.name}={value}")
+
+    def __str__(self):
+        return os.getenv(self.name, "")
