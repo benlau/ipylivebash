@@ -1,21 +1,7 @@
 import asyncio
 import ipywidgets as widgets
 from IPython.display import display
-import os
 from ipylivebash.sessionmanager import run_script  # noqa
-
-
-class EnvVar:
-    """
-    Wrapper for environment variable
-    """
-
-    def __init__(self, name):
-        self.name = name
-
-    def __call__(self, value, output):
-        os.environ[self.name] = value
-        output(f"Set {self.name}={value}")
 
 
 def _execute(script_or_callback, value, output_widget):
