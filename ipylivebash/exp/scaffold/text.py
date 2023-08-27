@@ -4,7 +4,7 @@ from .doublebufferoutput import DoubleBufferOutput
 from .execute import execute
 
 
-def select(title=None, options=None, run=None, value=None, action_label="Confirm"):
+def text(title=None, run=None, value=None, placeholder="", action_label="Confirm"):
     title_widget = None
     if title is not None:
         title_widget = widgets.Label(value=title)
@@ -12,10 +12,7 @@ def select(title=None, options=None, run=None, value=None, action_label="Confirm
     if value is not None and not isinstance(value, str):
         value = str(value)
 
-    if not value in options:
-        value = options[0]
-
-    select_widget = widgets.Select(options=options, value=value)
+    select_widget = widgets.Text(value=value, placeholder=placeholder)
     confirm_button = widgets.Button(description=action_label)
     output_area = DoubleBufferOutput()
 
@@ -31,18 +28,5 @@ def select(title=None, options=None, run=None, value=None, action_label="Confirm
     return widgets_box
 
 
-def display_select(title, options, run, *args, **kwargs):
-    """
-    Show a select widget
-
-    Parameters
-    ----------
-    title: str
-        Title of the widget
-
-    options: list
-        List of options(string)
-
-    run: str or callable or EnvVar
-    """
-    display(select(title, options, run, *args, **kwargs))
+def display_text(title, run, *args, **kwargs):
+    display(text(title, run, *args, **kwargs))
