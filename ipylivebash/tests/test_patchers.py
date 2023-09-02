@@ -103,6 +103,46 @@ def test_assignment_patch_shell_script():
                 """
             ),
         ),
+        (
+            # Ignore commented
+            textwrap.dedent(
+                """\
+                # Comment
+                a=1
+                # b=3
+                export b ='2' # Comment
+                """
+            ),
+            "b",
+            "10",
+            textwrap.dedent(
+                """\
+                # Comment
+                a=1
+                # b=3
+                export b ='10' # Comment
+                """
+            ),
+        ),
+        (
+            # Append if not available
+            textwrap.dedent(
+                """\
+                a=1
+                b=2
+                """
+            ),
+            "c",
+            "3",
+            textwrap.dedent(
+                """\
+                a=1
+                b=2
+
+                c=\"3\"
+                """
+            ),
+        ),
     ]
 
     patcher = PatchAssignment()

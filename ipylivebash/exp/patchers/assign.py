@@ -10,7 +10,9 @@ def make_regex(string: str, extra_flags: int = 0) -> Pattern[str]:
 
 
 _multiline_whitespace = make_regex(r"\s*", extra_flags=re.MULTILINE)
-_key = make_regex(r"[a-zA-Z_][a-zA-Z0-9_\.]*")  # Support dot for other format
+_key = make_regex(
+    r"[a-zA-Z_][a-zA-Z0-9_\.]*"
+)  # Support dot for other format like podspec
 _equal_sign = make_regex(r"(=[^\S\r\n]*)")
 _single_quoted_value = make_regex(r"'((?:\\'|[^'])*)'")
 _double_quoted_value = make_regex(r'"((?:\\"|[^"])*)"')
@@ -71,6 +73,9 @@ class PatchAssignment:
                 ret += extracted
             except ValueError:
                 return content
+
+        if value is None and replace is not None:
+            ret += f'\n{variable}="{replace}"\n'
 
         return ret, value
 

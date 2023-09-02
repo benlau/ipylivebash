@@ -3,10 +3,11 @@ from .scaffoldvar import ScaffoldVar
 
 
 class EnvFileVar(ScaffoldVar):
-    def __init__(self, file_name, variable_name):
+    def __init__(self, file_name, variable_name, default_variable_value):
         self.file_name = file_name
         self.variable_name = variable_name
         self.patcher = PatchAssignment()
+        self.default_value = default_variable_value
 
     def write(self, variable_value):
         content = self._read_file_content()
@@ -19,12 +20,12 @@ class EnvFileVar(ScaffoldVar):
     def write_message(self, value):
         return f"Set {self.variable_name}={value} to {self.file_name}"
 
-    def read(self, default_value=""):
+    def read(self):
         content = self._read_file_content()
 
         _, value = self.patcher(content, self.variable_name)
         if value is None:
-            return default_value
+            return self.default_variable_value
         return value
 
     def _read_file_content(self):

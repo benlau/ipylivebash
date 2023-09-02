@@ -7,8 +7,9 @@ class EnvVar(ScaffoldVar):
     Wrapper for environment variable
     """
 
-    def __init__(self, variable_name):
+    def __init__(self, variable_name, default_variable_value=""):
         self.variable_name = variable_name
+        self.default_variable_value = default_variable_value
 
     def write(self, value):
         os.environ[self.variable_name] = value
@@ -17,4 +18,4 @@ class EnvVar(ScaffoldVar):
         return f"Set {self.variable_name}={value}"
 
     def read(self):
-        return os.getenv(self.variable_name, "")
+        return os.getenv(self.variable_name, self.default_variable_value)
