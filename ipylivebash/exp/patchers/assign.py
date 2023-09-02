@@ -1,7 +1,5 @@
 import re
-from typing import (
-    Pattern,
-)
+from typing import Pattern, Optional, Tuple
 
 # Reference
 # https://github.com/theskumar/python-dotenv/blob/main/src/dotenv/parser.py
@@ -48,7 +46,7 @@ class PatchAssignment:
         self.comment = comment
         self.rest_of_line = rest_of_line
 
-    def parse(self, content, pattern):
+    def parse(self, content, pattern) -> Tuple[str, str]:
         match = pattern.match(content)
         if match is None:
             raise ValueError("Invalid format")
@@ -56,22 +54,30 @@ class PatchAssignment:
         remaining = content[match.end() :]
         return extracted, remaining
 
-    def __call__(self, content, variable, replace: str):
+    def __call__(
+        self, content, variable, replace: Optional[str] = None
+    ) -> Tuple[str, Optional[str]]:
         remaining = content
         ret = ""
+        value = None
 
         while len(remaining) > 0:
             try:
-                extracted, remaining = self.parse_line(remaining, variable, replace)
+                extracted, remaining, _value = self.parse_line(
+                    remaining, variable, replace
+                )
+                if _value is not None:
+                    value = _value
                 ret += extracted
             except ValueError:
                 return content
 
-        return ret
+        return ret, value
 
-    def parse_line(self, content, variable, replace):
+    def parse_line(self, content, variable, replace) -> Tuple[str, str, Optional[str]]:
         remaining = content
         ret = ""
+        value = None
 
         try:
             extracted, remaining = self.parse(remaining, self.multiline_whitespace)
@@ -92,30 +98,37 @@ class PatchAssignment:
             extracted, remaining = self.parse(remaining, self.whitespace)
             ret += extracted
 
-            extracted, remaining = self.parse_update_value(
-                remaining, replace if key == variable else None
-            )
+            if key == variable:
+                extracted, remaining, value = self.parse_update_value(
+                    remaining, replace
+                )
+            else:
+                extracted, remaining, _ = self.parse_update_value(remaining, None)
             ret += extracted
 
             extracted, remaining = self.parse(remaining, self.comment)
             ret += extracted
 
-            return ret, remaining
+            return ret, remaining, value
         except ValueError:
             extracted, remaining = self.parse(content, self.rest_of_line)
-            return extracted, remaining
+            return extracted, remaining, value
 
-    def parse_update_value(self, content, replace):
+    def parse_update_value(self, content, replace) -> Tuple[str, str, Optional[str]]:
+        value = None
         if content.startswith('"'):
             extracted, remaining = self.parse(content, self.double_quoted_value)
+            value = extracted[1:-1]
             if replace is not None:
-                return f'"{replace}"', remaining
+                return f'"{replace}"', remaining, value
         elif content.startswith("'"):
             extracted, remaining = self.parse(content, self.single_quoted_value)
+            value = extracted[1:-1]
             if replace is not None:
-                return f"'{replace}'", remaining
+                return f"'{replace}'", remaining, value
         else:
             extracted, remaining = self.parse(content, self.unquoted_value)
+            value = extracted
             if replace is not None:
-                return replace, remaining
-        return extracted, remaining
+                return replace, remaining, extracted
+        return extracted, remaining, value

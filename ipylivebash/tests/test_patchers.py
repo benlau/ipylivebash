@@ -2,6 +2,23 @@ from ..exp.patchers.assign import PatchAssignment
 import textwrap
 
 
+def test_assignment_patch_extract_original_value():
+    source = textwrap.dedent(
+        """\
+        a = '10'
+        """
+    )
+
+    patcher = PatchAssignment()
+    _, original_value = patcher(source, "b")
+
+    assert original_value == None
+
+    _, original_value = patcher(source, "a")
+
+    assert original_value == "10"
+
+
 def test_assignment_patch_shell_script():
     test_cases = [
         (
@@ -91,7 +108,7 @@ def test_assignment_patch_shell_script():
     patcher = PatchAssignment()
 
     for content, variable, replace, expected in test_cases:
-        result = patcher(content, variable, replace)
+        result, _ = patcher(content, variable, replace)
         assert result == expected
 
 
@@ -129,5 +146,5 @@ def test_assignment_patch_pod_spec():
     )
 
     patcher = PatchAssignment()
-    result = patcher(source, "spec.version", "3.1.1")
+    result, _ = patcher(source, "spec.version", "3.1.1")
     assert result == expected
