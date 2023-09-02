@@ -1,17 +1,20 @@
 import os
+from .scaffoldvar import ScaffoldVar
 
 
-class EnvVar:
+class EnvVar(ScaffoldVar):
     """
     Wrapper for environment variable
     """
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, variable_name):
+        self.variable_name = variable_name
 
-    def __call__(self, value, output):
-        os.environ[self.name] = value
-        output(f"Set {self.name}={value}")
+    def write(self, value):
+        os.environ[self.variable_name] = value
 
-    def __str__(self):
-        return os.getenv(self.name, "")
+    def write_message(self, value):
+        return f"Set {self.variable_name}={value}"
+
+    def read(self):
+        return os.getenv(self.variable_name, "")
