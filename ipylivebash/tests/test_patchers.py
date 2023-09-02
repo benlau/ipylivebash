@@ -32,7 +32,7 @@ def test_assignment_patch_shell_script():
             "3",
             textwrap.dedent(
                 """\
-                a=3
+                a="3"
                 b=2
                 """
             ),
@@ -49,7 +49,7 @@ def test_assignment_patch_shell_script():
             textwrap.dedent(
                 """\
                 a=1
-                 b = 10
+                 b = "10"
                 """
             ),
         ),
@@ -65,7 +65,7 @@ def test_assignment_patch_shell_script():
             textwrap.dedent(
                 """\
                 a=1
-                b ='10'
+                b ="10"
                 """
             ),
         ),
@@ -81,7 +81,7 @@ def test_assignment_patch_shell_script():
             textwrap.dedent(
                 """\
                 a=1
-                export b ='10'
+                export b ="10"
                 """
             ),
         ),
@@ -99,7 +99,7 @@ def test_assignment_patch_shell_script():
                 """\
                 # Comment
                 a=1
-                export b ='10' # Comment
+                export b ="10" # Comment
                 """
             ),
         ),
@@ -110,7 +110,7 @@ def test_assignment_patch_shell_script():
                 # Comment
                 a=1
                 # b=3
-                export b ='2' # Comment
+                export b ="2" # Comment
                 """
             ),
             "b",
@@ -120,7 +120,7 @@ def test_assignment_patch_shell_script():
                 # Comment
                 a=1
                 # b=3
-                export b ='10' # Comment
+                export b ="10" # Comment
                 """
             ),
         ),
@@ -139,8 +139,25 @@ def test_assignment_patch_shell_script():
                 a=1
                 b=2
 
-                c=\"3\"
+                c="3\""""
+            ),
+        ),
+        (
+            # Escape double quotes
+            textwrap.dedent(
+                """\
+                a=1.1
+                b=2
                 """
+            ),
+            "c",
+            '"3"',
+            textwrap.dedent(
+                """\
+                a=1.1
+                b=2
+
+                c="\\\"3\\\"\""""
             ),
         ),
     ]
@@ -173,7 +190,7 @@ def test_assignment_patch_pod_spec():
         """\
         Pod::Spec.new do |spec|
         spec.name         = 'Reachability'
-        spec.version      = '3.1.1'
+        spec.version      = "3.1.1"
         spec.license      = { :type => 'BSD' }
         spec.homepage     = 'https://github.com/tonymillion/Reachability'
         spec.authors      = { 'Tony Million' => 'tonymillion@gmail.com' }

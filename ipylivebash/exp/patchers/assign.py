@@ -1,5 +1,6 @@
 import re
 from typing import Pattern, Optional, Tuple
+import json
 
 # Reference
 # https://github.com/theskumar/python-dotenv/blob/main/src/dotenv/parser.py
@@ -57,7 +58,7 @@ class PatchAssignment:
         return extracted, remaining
 
     def __call__(
-        self, content, variable, replace: Optional[str] = None
+        self, content, variable, replacement: Optional[str] = None
     ) -> Tuple[str, Optional[str]]:
         remaining = content
         ret = ""
@@ -66,7 +67,7 @@ class PatchAssignment:
         while len(remaining) > 0:
             try:
                 extracted, remaining, _value = self.parse_line(
-                    remaining, variable, replace
+                    remaining, variable, replacement
                 )
                 if _value is not None:
                     value = _value
@@ -74,12 +75,14 @@ class PatchAssignment:
             except ValueError:
                 return content
 
-        if value is None and replace is not None:
-            ret += f'\n{variable}="{replace}"\n'
+        if value is None and replacement is not None:
+            ret += f"\n{variable}={self.normalize(replacement)}"
 
         return ret, value
 
-    def parse_line(self, content, variable, replace) -> Tuple[str, str, Optional[str]]:
+    def parse_line(
+        self, content, variable, replacement
+    ) -> Tuple[str, str, Optional[str]]:
         remaining = content
         ret = ""
         value = None
@@ -105,7 +108,7 @@ class PatchAssignment:
 
             if key == variable:
                 extracted, remaining, value = self.parse_update_value(
-                    remaining, replace
+                    remaining, replacement
                 )
             else:
                 extracted, remaining, _ = self.parse_update_value(remaining, None)
@@ -119,21 +122,26 @@ class PatchAssignment:
             extracted, remaining = self.parse(content, self.rest_of_line)
             return extracted, remaining, value
 
-    def parse_update_value(self, content, replace) -> Tuple[str, str, Optional[str]]:
+    def parse_update_value(
+        self, content, replacement
+    ) -> Tuple[str, str, Optional[str]]:
         value = None
         if content.startswith('"'):
             extracted, remaining = self.parse(content, self.double_quoted_value)
             value = extracted[1:-1]
-            if replace is not None:
-                return f'"{replace}"', remaining, value
+            if replacement is not None:
+                return f"{self.normalize(replacement)}", remaining, value
         elif content.startswith("'"):
             extracted, remaining = self.parse(content, self.single_quoted_value)
             value = extracted[1:-1]
-            if replace is not None:
-                return f"'{replace}'", remaining, value
+            if replacement is not None:
+                return f"{self.normalize(replacement)}", remaining, value
         else:
             extracted, remaining = self.parse(content, self.unquoted_value)
             value = extracted
-            if replace is not None:
-                return replace, remaining, extracted
+            if replacement is not None:
+                return self.normalize(replacement), remaining, extracted
         return extracted, remaining, value
+
+    def normalize(self, text):
+        return json.dumps(text)
