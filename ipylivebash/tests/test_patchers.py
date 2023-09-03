@@ -160,6 +160,23 @@ def test_assignment_patch_shell_script():
                 c="\\\"3\\\"\""""
             ),
         ),
+        (
+            # Obtaining space
+            textwrap.dedent(
+                """\
+                a=1.1
+                b=2
+                """
+            ),
+            "a",
+            '3 4',
+            textwrap.dedent(
+                """\
+                a="3 4"
+                b=2
+                """
+            ),
+        ),
     ]
 
     patcher = PatchAssignment()
@@ -204,4 +221,22 @@ def test_assignment_patch_pod_spec():
 
     patcher = PatchAssignment()
     result, _ = patcher(source, "spec.version", "3.1.1")
+    assert result == expected
+
+
+def test_assignment_patch_python():
+    source = textwrap.dedent(
+        """\
+        __VERSION__ ='3.1.0'
+        """
+    )
+
+    expected = textwrap.dedent(
+        """\
+        __VERSION__ ="3.2.0"
+        """
+    )
+
+    patcher = PatchAssignment()
+    result, _ = patcher(source, "__VERSION__", "3.2.0")
     assert result == expected
