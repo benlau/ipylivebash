@@ -169,7 +169,7 @@ def test_assignment_patch_shell_script():
                 """
             ),
             "a",
-            '3 4',
+            "3 4",
             textwrap.dedent(
                 """\
                 a="3 4"
