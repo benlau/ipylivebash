@@ -1,3 +1,6 @@
+import logging
+
+
 def left_pad(string, length, pad_char=" "):
     if len(string) >= length:
         return string
@@ -16,3 +19,20 @@ def run_chain(funcs):
         run_chain(remaining)
 
     func(next)
+
+
+logger = None
+
+
+def log(message):
+    global logger
+
+    if logger is None:
+        logger = logging.getLogger("ipylivebash")
+        logger.setLevel(logging.DEBUG)
+
+        fh = logging.FileHandler("debug.log")
+        fh.setLevel(logging.DEBUG)
+        logger.addHandler(fh)
+
+    logger.debug(message)

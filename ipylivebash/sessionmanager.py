@@ -2,8 +2,9 @@ from .logfile import LogFile
 from .session import Session, SessionState
 import asyncio
 from .logview import LogView
-from .utils import run_chain, left_pad
-from IPython.display import display
+from .utils import run_chain, left_pad, log
+from IPython.display import display, clear_output
+
 import time
 import json
 from tabulate import tabulate
@@ -127,8 +128,11 @@ class SessionManager:
         self.refresh_sessions()
 
     def run_session_with_view(self, session, args):
-        session.args = args
+        # Calling clear_output here to make sure the new
+        # view can be shown in VSCode
+        clear_output()
 
+        session.args = args
         view = self.create_view(session)
         self.set_view_property(session, "height", args.height)
         self.set_view_property(session, "script", session.script)
