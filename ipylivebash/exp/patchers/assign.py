@@ -25,6 +25,10 @@ _rest_of_line = make_regex(r".*[^\r\n]*(?:\r|\n|\r\n)?")
 
 
 class PatchAssignment:
+    """
+    Patch content with assignment expression
+    """
+
     def __init__(
         self,
         equal_sign=_equal_sign,

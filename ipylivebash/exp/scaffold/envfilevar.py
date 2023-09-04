@@ -3,7 +3,7 @@ from .scaffoldvar import ScaffoldVar
 
 
 class EnvFileVar(ScaffoldVar):
-    def __init__(self, file_name, variable_name, default_variable_value):
+    def __init__(self, file_name, variable_name, default_variable_value=None):
         self.file_name = file_name
         self.variable_name = variable_name
         self.patcher = PatchAssignment()
@@ -22,6 +22,8 @@ class EnvFileVar(ScaffoldVar):
 
     def read(self):
         content = self._read_file_content()
+        if content is None:
+            return self.default_value
 
         _, value = self.patcher(content, self.variable_name)
         if value is None:
@@ -29,8 +31,11 @@ class EnvFileVar(ScaffoldVar):
         return value
 
     def _read_file_content(self):
-        file = open(self.file_name, "r")
-        content = file.read()
-        file.close()
-        self.content = content
+        try:
+            file = open(self.file_name, "r")
+            content = file.read()
+            file.close()
+            self.content = content
+        except FileNotFoundError:
+            return None
         return content
