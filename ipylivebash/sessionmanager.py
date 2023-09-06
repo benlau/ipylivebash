@@ -5,6 +5,7 @@ from .logview import LogView
 from .utils import run_chain, left_pad, log
 from IPython.display import display, clear_output
 
+import uuid
 import time
 import json
 from tabulate import tabulate
@@ -97,11 +98,18 @@ class SessionManager:
     def create_session(self):
         session = Session()
         session.id = f"instance{left_pad(str(self.next_id), 4, '0')}"
-        session.cell_id = self.current_cell_id
+        session.cell_id = (
+            self.current_cell_id
+            if self.current_cell_id is not None
+            else self.create_session_id()
+        )
         self.current_cell_id = None
         self.next_id = self.next_id + 1
         self.sessions.append(session)
         return session
+
+    def create_session_id(self):
+        return f"fake_id_{uuid.uuid4()}"
 
     def create_view(self, session):
         view = LogView(session_id=session.id, cell_id=session.cell_id)
@@ -210,7 +218,11 @@ class SessionManager:
         def flush():
             self.flush(session_id)
 
-        future = session.run(output=output, flush=flush)
+        env = {
+            "LIVEBASH_CELL_ID": session.cell_id,
+        }
+
+        future = session.run(output=output, flush=flush, env=env)
 
         def on_finish():
             self.on_session_finished(session_id, future.result())
