@@ -4,29 +4,63 @@ from .doublebufferoutput import DoubleBufferOutput
 from .execute import execute
 
 
-def text(title=None, run=None, value=None, placeholder="", action_label="Confirm"):
-    title_widget = None
-    if title is not None:
-        title_widget = widgets.Label(value=title)
+class ScaffoldText:
+    def __init__(
+        self,
+        input=None,
+        output=None,
+        title=None,
+        placeholder="",
+        action_label="Confirm",
+        defaults=None,
+    ):
+        self.input = input
+        if output is None:
+            self.output = input
+        else:
+            self.output = output
+        self.title = title
+        self.placeholder = placeholder
+        self.action_label = action_label
+        if defaults is not None and not isinstance(defaults, str):
+            defaults = str(defaults)
+        self.defaults = defaults
 
-    if value is not None and not isinstance(value, str):
-        value = str(value)
+    def create_ipywidget(self):
+        layout = []
+        title_widget = None
+        if self.title is not None:
+            title_widget = widgets.Label(value=self.title)
+            layout.append(title_widget)
 
-    select_widget = widgets.Text(value=value, placeholder=placeholder)
-    confirm_button = widgets.Button(description=action_label)
-    output_area = DoubleBufferOutput()
+        value = str(self.input) if self.input is not None else None
+        if value is None and self.defaults is not None:
+            value = self.defaults
 
-    def confirm_button_callback(b):
-        execute(run, select_widget.value, output_area)
+        text = widgets.Text(value=value, placeholder=self.placeholder)
+        confirm_button = widgets.Button(description=self.action_label)
+        output_area = DoubleBufferOutput()
 
-    confirm_button.on_click(confirm_button_callback)
+        def confirm_button_callback(_):
+            execute(self.output, text.value, output_area)
 
-    widgets_box = widgets.VBox(
-        [title_widget, select_widget, confirm_button, output_area.vbox]
+        confirm_button.on_click(confirm_button_callback)
+
+        widgets_box = widgets.VBox(layout + [text, confirm_button, output_area.vbox])
+
+        return widgets_box
+
+
+def display_text(
+    input=None,
+    output=None,
+    title=None,
+    placeholder="",
+    action_label="Confirm",
+    defaults=None,
+):
+    display(
+        ScaffoldText(
+            input, output, title, placeholder, action_label, defaults
+        ).create_ipywidget()
     )
-
-    return widgets_box
-
-
-def display_text(title, run, *args, **kwargs):
-    display(text(title, run, *args, **kwargs))
