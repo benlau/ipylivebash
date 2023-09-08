@@ -75,4 +75,8 @@ def display_select(
 
     run: str or callable or EnvVar
     """
-    display(ScaffoldSelect(input, output, title, options, defaults, action_label).create_ipywidgets())
+    display(
+        ScaffoldSelect(
+            input, output, title, options, defaults, action_label
+        ).create_ipywidgets()
+    )

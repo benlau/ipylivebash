@@ -3,6 +3,7 @@ from IPython.display import display
 from .doublebufferoutput import DoubleBufferOutput
 from .execute import execute
 from .scaffoldwidget import ScaffoldWidget
+from .utils import inspect_arg_name
 
 
 class ScaffoldText(ScaffoldWidget):
@@ -20,7 +21,12 @@ class ScaffoldText(ScaffoldWidget):
             self.output = input
         else:
             self.output = output
-        self.title = title
+        if title is not None:
+            self.title = title
+        elif input is not None:
+            self.title = inspect_arg_name(0, "input")
+        elif output is not None:
+            self.title = inspect_arg_name(1, "output")
         self.placeholder = placeholder
         self.action_label = action_label
         if defaults is not None and not isinstance(defaults, str):
@@ -60,6 +66,12 @@ def display_text(
     defaults=None,
     action_label="Confirm",
 ):
+    if title is None:
+        if input is not None:
+            title = inspect_arg_name(0, "input")
+        elif output is not None:
+            title = inspect_arg_name(1, "output")
+
     display(
         ScaffoldText(
             input, output, title, placeholder, defaults, action_label
