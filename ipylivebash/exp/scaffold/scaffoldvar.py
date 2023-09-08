@@ -4,4 +4,5 @@ class ScaffoldVar:
         output(self.write_message(value))
 
     def __str__(self):
-        return self.read()
+        ret = self.read()
+        return ret if ret is not None else ""

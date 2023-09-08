@@ -2,17 +2,18 @@ import ipywidgets as widgets
 from IPython.display import display
 from .doublebufferoutput import DoubleBufferOutput
 from .execute import execute
+from .scaffoldwidget import ScaffoldWidget
 
 
-class ScaffoldText:
+class ScaffoldText(ScaffoldWidget):
     def __init__(
         self,
         input=None,
         output=None,
         title=None,
         placeholder="",
-        action_label="Confirm",
         defaults=None,
+        action_label="Confirm",
     ):
         self.input = input
         if output is None:
@@ -42,7 +43,7 @@ class ScaffoldText:
         output_area = DoubleBufferOutput()
 
         def confirm_button_callback(_):
-            execute(self.output, text.value, output_area)
+            self.execute(text.value, self.output, output_area)
 
         confirm_button.on_click(confirm_button_callback)
 
@@ -56,11 +57,11 @@ def display_text(
     output=None,
     title=None,
     placeholder="",
-    action_label="Confirm",
     defaults=None,
+    action_label="Confirm",
 ):
     display(
         ScaffoldText(
-            input, output, title, placeholder, action_label, defaults
+            input, output, title, placeholder, defaults, action_label
         ).create_ipywidget()
     )

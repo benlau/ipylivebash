@@ -1,5 +1,5 @@
 from .envvar import *
-from .select import *
-from .text import *
+from .scaffoldselect import *
+from .scaffoldtext import *
 from .envfilevar import *
 from .jsonfilevar import *
