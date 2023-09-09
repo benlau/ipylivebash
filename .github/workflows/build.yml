@@ -59,10 +59,21 @@ jobs:
       - name: Build package
         run: |
           make build_package
-          rm dist/index*
 
       - name: Archive package
         uses: actions/upload-artifact@v3
         with:
-          name: package
-          path: dist/*
+          name: python_package
+          path: |
+            dist/*.whl
+            dist/*.gz
+
+      - name: Archive package
+        uses: actions/upload-artifact@v3
+        with:
+          name: js_package
+          path: |
+            dist/*.js
+            lib/**/*.js
+            css/*.css
+            package.json
