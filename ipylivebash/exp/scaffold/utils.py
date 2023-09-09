@@ -1,4 +1,13 @@
 import inspect
+import re
+
+
+def is_varible_name(name: str):
+    pattern = re.compile(r"[_a-zA-Z_][a-zA-Z0-9_]*")
+    match = pattern.match(name)
+    if match is None or match.end() != len(name):
+        return False
+    return True
 
 
 def inspect_arg_name(pos: int, name: str):
@@ -10,14 +19,22 @@ def inspect_arg_name(pos: int, name: str):
         args = [arg.strip() for arg in args]
         keyword = {}
         for arg in args:
-            if arg.find("=") != -1:
-                token = arg.split("=")
-                key = token[0].strip()
-                value = "=".join(token[1:]).strip()
-                keyword[key] = value
+            token = arg.split("=")
+            if len(token) != 2:
+                continue
+            key = token[0].strip()
+            if is_varible_name(key) is False:
+                continue
+            value = token[1].strip()
+            if is_varible_name(value) is False:
+                continue
+            keyword[key] = value
         if name in keyword:
             return keyword[name]
         else:
+            ret = args[pos]
+            if is_varible_name(ret) is False:
+                return None
             return args[pos]
     except Exception:
         return None

@@ -2,7 +2,7 @@ import ipywidgets as widgets
 from IPython.display import display
 from .doublebufferoutput import DoubleBufferOutput
 from .execute import execute
-from .scaffoldwidget import ScaffoldWidget
+from .scaffoldwidget import ScaffoldWidget, preset_iot
 from .utils import inspect_arg_name
 
 
@@ -17,16 +17,11 @@ class ScaffoldText(ScaffoldWidget):
         action_label="Confirm",
     ):
         self.input = input
+        self.title = title
         if output is None:
             self.output = input
         else:
             self.output = output
-        if title is not None:
-            self.title = title
-        elif input is not None:
-            self.title = inspect_arg_name(0, "input")
-        elif output is not None:
-            self.title = inspect_arg_name(1, "output")
         self.placeholder = placeholder
         self.action_label = action_label
         if defaults is not None and not isinstance(defaults, str):
@@ -58,6 +53,7 @@ class ScaffoldText(ScaffoldWidget):
         return widgets_box
 
 
+@preset_iot
 def display_text(
     input=None,
     output=None,
@@ -66,12 +62,6 @@ def display_text(
     defaults=None,
     action_label="Confirm",
 ):
-    if title is None:
-        if input is not None:
-            title = inspect_arg_name(0, "input")
-        elif output is not None:
-            title = inspect_arg_name(1, "output")
-
     display(
         ScaffoldText(
             input, output, title, placeholder, defaults, action_label

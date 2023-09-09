@@ -1,4 +1,4 @@
-from ipylivebash.exp.scaffold.scaffoldwidget import ScaffoldWidget
+from ipylivebash.exp.scaffold.scaffoldwidget import ScaffoldWidget, preset_iot
 import ipywidgets as widgets
 from IPython.display import display
 from .doublebufferoutput import DoubleBufferOutput
@@ -54,6 +54,7 @@ class ScaffoldSelect(ScaffoldWidget):
         return widgets_box
 
 
+@preset_iot
 def display_select(
     input=None,
     output=None,
