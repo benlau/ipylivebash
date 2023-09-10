@@ -1,9 +1,7 @@
 import ipywidgets as widgets
 from IPython.display import display
 from .doublebufferoutput import DoubleBufferOutput
-from .execute import execute
 from .scaffoldwidget import ScaffoldWidget, preset_iot
-from .utils import inspect_arg_name
 
 
 class ScaffoldText(ScaffoldWidget):

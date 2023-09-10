@@ -2,7 +2,6 @@ from ipylivebash.exp.scaffold.scaffoldwidget import ScaffoldWidget, preset_iot
 import ipywidgets as widgets
 from IPython.display import display
 from .doublebufferoutput import DoubleBufferOutput
-from .execute import execute
 
 
 class ScaffoldSelect(ScaffoldWidget):

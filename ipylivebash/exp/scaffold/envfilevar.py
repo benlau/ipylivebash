@@ -20,7 +20,7 @@ class EnvFileVar(ScaffoldVar):
         file.close()
 
     def write_message(self, value):
-        return f"Set {self.key}={value} to {self.filename}"
+        return f"Set {self.key}={value} to {self.filename}\n"
 
     def read(self):
         content = self._read_file_content()

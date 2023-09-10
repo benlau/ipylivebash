@@ -1,7 +1,7 @@
 class ScaffoldVar:
-    def __call__(self, value, output):
+    def __call__(self, value, append):
         self.write(value)
-        output(self.write_message(value))
+        append(self.write_message(value))
 
     def __str__(self):
         ret = self.read()

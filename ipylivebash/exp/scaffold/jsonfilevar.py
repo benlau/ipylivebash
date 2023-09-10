@@ -15,7 +15,7 @@ class JsonFileVar(ScaffoldVar):
         self.indent = indent
 
     def write_message(self, value):
-        return f"Set {self.variable_name}={value} to {self.filename}"
+        return f"Set {self.variable_name}={value} to {self.filename}\n"
 
     def write(self, value):
         content = self._read_json_from_file()
