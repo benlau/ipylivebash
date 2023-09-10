@@ -8,9 +8,11 @@ def test_envfile_var_read_not_existed_file():
 
 
 def test_envfile_var_write_not_existed_file():
-    tmp_file = NamedTemporaryFile(delete=False)
+    tmp_file = NamedTemporaryFile(delete=True)
+    filename = tmp_file.name
+    tmp_file.close()
 
-    var = EnvFileVar(tmp_file.name, "A")
+    var = EnvFileVar(filename, "A")
     var.write("value")
 
     file = open(tmp_file.name, "r")
