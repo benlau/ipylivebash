@@ -1,9 +1,16 @@
+from enum import Enum
 import re
 from typing import Pattern, Optional, Tuple
 import json
 
 # Reference
 # https://github.com/theskumar/python-dotenv/blob/main/src/dotenv/parser.py
+
+
+class QuoteType(Enum):
+    No = "no"
+    Double = "double"
+    Single = "single"
 
 
 def make_regex(string: str, extra_flags: int = 0) -> Pattern[str]:
@@ -134,12 +141,20 @@ class PatchAssignment:
             extracted, remaining = self.parse(content, self.double_quoted_value)
             value = extracted[1:-1]
             if replacement is not None:
-                return f"{self.normalize(replacement)}", remaining, value
+                return (
+                    f"{self.normalize(replacement, quote=QuoteType.Double)}",
+                    remaining,
+                    value,
+                )
         elif content.startswith("'"):
             extracted, remaining = self.parse(content, self.single_quoted_value)
             value = extracted[1:-1]
             if replacement is not None:
-                return f"{self.normalize(replacement)}", remaining, value
+                return (
+                    f"{self.normalize(replacement, quote=QuoteType.Single)}",
+                    remaining,
+                    value,
+                )
         else:
             extracted, remaining = self.parse(content, self.unquoted_value)
             value = extracted
@@ -147,5 +162,12 @@ class PatchAssignment:
                 return self.normalize(replacement), remaining, extracted
         return extracted, remaining, value
 
-    def normalize(self, text):
-        return json.dumps(text)
+    def normalize(self, text, quote=None):
+        if quote is QuoteType.Single:
+            escaped = text.replace("'", r"\'")
+            return f"'{escaped}'"
+        elif quote is QuoteType.Double:
+            return json.dumps(text)
+        elif " " in text or '"' in text:
+            return json.dumps(text)
+        return text

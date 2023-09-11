@@ -22,7 +22,7 @@ class EventType(Enum):
     CancelledToRun = "CancelledToRun"
 
 
-async def run_script(script, output=None, env=None):
+async def run_script(script, print_line=None, env=None):
     """
     Run script via Python API without UI.
     """
@@ -32,19 +32,19 @@ async def run_script(script, output=None, env=None):
 
     def output_to_widget(message):
         try:
-            output.append_stdout(message)
+            print_line.append_stdout(message)
         except Exception as e:
             output_to_print(e)
 
     manager = SessionManager.get_instance()
     session = manager.create_session()
     session.script = script
-    if output is None:
+    if print_line is None:
         output_func = output_to_print
-    elif hasattr(output, "append_stdout"):
+    elif hasattr(print_line, "append_stdout"):
         output_func = output_to_widget
     else:
-        output_func = output
+        output_func = print_line
     return await manager.run_session(session, output=output_func, env=env)
 
 

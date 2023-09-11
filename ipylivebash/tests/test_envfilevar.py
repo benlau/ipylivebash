@@ -18,4 +18,4 @@ def test_envfile_var_write_not_existed_file():
     file = open(tmp_file.name, "r")
     content = file.read()
 
-    assert content == '\nA="value"'
+    assert content == "\nA=value"

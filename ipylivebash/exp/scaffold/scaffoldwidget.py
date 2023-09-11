@@ -37,7 +37,9 @@ class ScaffoldWidget:
                 env = {
                     "LIVEBASH_VALUE": input,
                 }
-                task = run_script(script, output_widget.append_stdout, env=env)
+                task = run_script(
+                    script, print_line=output_widget.append_stdout, env=env
+                )
                 asyncio.get_event_loop().create_task(task)
             elif callable(target):
                 target(input, output_widget.append_stdout)
