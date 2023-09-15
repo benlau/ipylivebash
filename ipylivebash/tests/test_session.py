@@ -13,6 +13,6 @@ async def test_session_run():
     def pr(message):
         messages.append(message)
 
-    await session.run(output=pr)
+    await session.run(print_line=pr)
     assert len(messages) == 1
     assert messages[0] == "123\n"

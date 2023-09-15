@@ -21,7 +21,7 @@ async def test_runtask_should_print_line_at_main_thread():
 
     runtask = RunTask()
     runtask.script = script
-    await runtask(output=print_line)
+    await runtask(print_line=print_line)
 
     assert content == ["1\n", "2\n", "3\n"]
     assert is_main_thread == True

@@ -21,7 +21,7 @@ async def test_run_session():
     def pr(message):
         messages.append(message)
 
-    await manager.run_session(session, output=pr)
+    await manager.run_session(session, print_line=pr)
     assert len(messages) == 1
     assert messages[0] == "123\n"
     assert session.exit_code == 0
@@ -38,7 +38,7 @@ async def test_session_run_should_strip_stopped_session():
         session = manager.create_session()
         session.script = ECHO_SCRIPT
 
-        await manager.run_session(session, output=pr)
+        await manager.run_session(session, print_line=pr)
 
     assert len(manager.sessions) == 10
     assert manager.sessions[0].id == "instance0003"
@@ -58,7 +58,7 @@ async def test_session_run_support_env():
 echo $TEST_ENV
 """
     env = {"TEST_ENV": "123456"}
-    await manager.run_session(session, output=pr, env=env)
+    await manager.run_session(session, print_line=pr, env=env)
 
     assert len(messages) == 1
     assert messages[0] == "123456\n"

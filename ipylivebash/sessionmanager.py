@@ -119,13 +119,13 @@ class SessionManager:
         self.views.append(view)
         return view
 
-    async def run_session(self, session, output=print, env=None):
+    async def run_session(self, session, print_line=print, env=None):
         session.args = {}
         session.state = SessionState.Running
         self.refresh_sessions()
 
         try:
-            exit_code = await session.run(output=output, env=env)
+            exit_code = await session.run(print_line=print_line, env=env)
             session.state = SessionState.Completed
             session.exit_code = exit_code
         except asyncio.CancelledError:
