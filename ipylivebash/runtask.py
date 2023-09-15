@@ -51,6 +51,13 @@ class RunTask:
             running = False
             mutex.release()
 
+
+        def write_batch(messages):
+            for message in messages:
+                output(message)
+            if flush is not None:
+                flush()
+
         def writer():
             nonlocal running
             nonlocal pending_messages
@@ -59,10 +66,7 @@ class RunTask:
                 time.sleep(0.1)
                 mutex.acquire()
                 if len(pending_messages) > 0:
-                    for message in pending_messages:
-                        output(message)
-                    if flush is not None:
-                        flush()
+                    loop.call_soon_threadsafe(write_batch, pending_messages.copy())
                     pending_messages = []
                 mutex.release()
 
