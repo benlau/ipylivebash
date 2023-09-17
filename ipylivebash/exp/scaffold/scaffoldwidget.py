@@ -22,6 +22,24 @@ def preset_iot(func):
     return inner
 
 
+def preset_iot_init(func):
+    """
+    A decorator that preset the input, output, title arguments
+    """
+
+    def inner(self, input=None, output=None, title=None, *args, **kwargs):
+        if title is None:
+            if input is not None:
+                title = inspect_arg_name(0, "input")
+            elif output is not None:
+                title = inspect_arg_name(1, "output")
+        if output is None:
+            output = input
+        return func(self, input, output, title, *args, **kwargs)
+
+    return inner
+
+
 class ScaffoldWidget:
     def execute(self, input, output, output_widget: DoubleBufferOutput):
         if isinstance(output, list):

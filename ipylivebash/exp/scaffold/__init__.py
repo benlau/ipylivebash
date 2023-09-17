@@ -4,3 +4,4 @@ from .scaffoldtext import *
 from .envfilevar import *
 from .jsonfilevar import *
 from .form import *
+from .singlevaluelayout import *

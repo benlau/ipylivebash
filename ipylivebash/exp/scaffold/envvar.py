@@ -18,4 +18,4 @@ class EnvVar(ScaffoldVar):
         return f"Set {self.key}={value}\n"
 
     def read(self):
-        return os.getenv(self.key, self.defaults)
+        return os.getenv(self.key)
