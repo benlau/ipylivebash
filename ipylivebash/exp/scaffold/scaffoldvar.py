@@ -2,9 +2,10 @@ from typing import Optional
 
 
 class ScaffoldVar:
-    def __call__(self, value, append):
+    def __call__(self, value=None, print_line=None):
         self.write(value)
-        append(self.write_message(value))
+        if print_line is not None:
+            print_line(self.write_message(value))
 
     def __str__(self):
         ret = self.read()
@@ -23,3 +24,16 @@ class ScaffoldVar:
         Read raw value
         """
         raise NotImplementedError()
+
+    def valiate(self, value=None, defaults=None):
+        if value is not None:
+            return value
+        if defaults is None:
+            return None
+
+        if isinstance(defaults, str):
+            return defaults
+        elif isinstance(defaults, list):
+            return defaults[0]
+
+        return None

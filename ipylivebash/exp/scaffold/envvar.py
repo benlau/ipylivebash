@@ -11,8 +11,9 @@ class EnvVar(ScaffoldVar):
         self.key = key
         self.defaults = defaults
 
-    def write(self, value):
-        os.environ[self.key] = value
+    def write(self, value=None):
+        validaed_value = self.valiate(value, self.defaults)
+        os.environ[self.key] = validaed_value
 
     def write_message(self, value):
         return f"Set {self.key}={value}\n"
