@@ -12,10 +12,7 @@ class JsonFileVar(ScaffoldVar):
         self.defaults = defaults
         self.indent = indent
 
-    def write_message(self, value):
-        return f"Set {self.key}={value} to {self.filename}\n"
-
-    def write(self, value):
+    def write(self, value, options=None):
         content = self._read_json_from_file()
         if content is None:
             content = {}
@@ -23,6 +20,9 @@ class JsonFileVar(ScaffoldVar):
         file = open(self.filename, "w")
         file.write(json.dumps(new_content, indent=self.indent))
         file.close()
+
+        if options is not None and options.print_line is not None:
+            options.print_line(f"Set {self.key}={value} to {self.filename}\n")
 
     def read(self):
         content = self._read_json_from_file()

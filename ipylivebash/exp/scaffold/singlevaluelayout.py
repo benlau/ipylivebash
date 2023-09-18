@@ -28,6 +28,8 @@ class SingleValueLayout(ScaffoldWidget):
             and isinstance(self.input.defaults, list)
             and not isinstance(self.input.defaults, str)
         ):
+            if value not in self.input.defaults:
+                value = None
             input_widget = widgets.Select(options=self.input.defaults, value=value)
         else:
             input_widget = widgets.Text(value=value)

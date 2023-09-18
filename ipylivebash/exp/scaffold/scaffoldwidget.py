@@ -2,6 +2,7 @@ from ipylivebash.sessionmanager import run_script  # noqa
 import asyncio
 from .doublebufferoutput import DoubleBufferOutput
 from .utils import inspect_arg_name
+from .inputoutputmixin import InputOutputOptions
 
 
 def preset_iot(func):
@@ -49,15 +50,19 @@ class ScaffoldWidget:
 
         output_widget.clear_output()
 
+        options = InputOutputOptions(
+            print_line=output_widget.append_stdout,
+        )
+
         for target in outputs:
             if isinstance(target, str):
                 script = target
                 env = {
-                    "LIVEBASH_VALUE": input,
+                    "LB_VALUE": input,
                 }
                 task = run_script(
                     script, print_line=output_widget.append_stdout, env=env
                 )
                 asyncio.get_event_loop().create_task(task)
             elif callable(target):
-                target(input, output_widget.append_stdout)
+                target(input, options)

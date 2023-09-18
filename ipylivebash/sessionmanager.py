@@ -45,7 +45,7 @@ async def run_script(script, print_line=None, env=None):
         output_func = output_to_widget
     else:
         output_func = print_line
-    return await manager.run_session(session, output=output_func, env=env)
+    return await manager.run_session(session, print_line=output_func, env=env)
 
 
 class SessionManager:
@@ -212,7 +212,7 @@ class SessionManager:
         session.state = SessionState.Running
         self.refresh_sessions()
 
-        def output(message):
+        def print_line(message):
             self.write_message(session_id, message)
 
         def flush():
@@ -222,7 +222,7 @@ class SessionManager:
             "LIVEBASH_CELL_ID": session.cell_id,
         }
 
-        future = session.run(output=output, flush=flush, env=env)
+        future = session.run(print_line=print_line, flush=flush, env=env)
 
         def on_finish():
             self.on_session_finished(session_id, future.result())

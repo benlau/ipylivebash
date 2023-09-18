@@ -1,5 +1,6 @@
 import os
 from .scaffoldvar import ScaffoldVar
+from .inputoutputmixin import InputOutputOptions
 
 
 class EnvVar(ScaffoldVar):
@@ -11,12 +12,11 @@ class EnvVar(ScaffoldVar):
         self.key = key
         self.defaults = defaults
 
-    def write(self, value=None):
-        validaed_value = self.valiate(value, self.defaults)
+    def write(self, value=None, options: InputOutputOptions = None):
+        validaed_value = self.validate(value, self.defaults)
         os.environ[self.key] = validaed_value
+        if options is not None and options.print_line is not None:
+            options.print_line(f"Set {self.key}={value}\n")
 
-    def write_message(self, value):
-        return f"Set {self.key}={value}\n"
-
-    def read(self):
+    def read(self, options: InputOutputOptions = None):
         return os.getenv(self.key)
