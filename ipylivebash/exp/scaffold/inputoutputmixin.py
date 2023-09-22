@@ -1,15 +1,24 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List, Union
 from abc import ABC
 from dataclasses import dataclass
 
 
 @dataclass
 class InputOutputOptions:
+    # For reporting the progress
     print_line: Optional[Callable[[str], None]] = None
+
+    # Shared storage between input and output
     shared_storage: Optional[dict] = None
+
+    source: Optional[Union[List["InputObject"], "InputObject"]] = None
 
 
 class InputObject(ABC):
+    """
+    InputObject
+    """
+
     def __str__(self):
         return self.to_string()
 
