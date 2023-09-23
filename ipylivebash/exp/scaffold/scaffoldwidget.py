@@ -2,7 +2,7 @@ from ipylivebash.sessionmanager import run_script  # noqa
 import asyncio
 from .doublebufferoutput import DoubleBufferOutput
 from .utils import inspect_arg_name
-from .inputoutputmixin import InputOutputOptions
+from .inputoutputmixin import IOOptions
 
 
 def preset_iot(func):
@@ -50,7 +50,7 @@ class ScaffoldWidget:
 
         output_widget.clear_output()
 
-        options = InputOutputOptions(
+        options = IOOptions(
             print_line=output_widget.append_stdout,
         )
 

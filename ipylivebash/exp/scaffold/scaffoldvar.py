@@ -1,7 +1,7 @@
-from .inputoutputmixin import InputObjectMixin
+from .inputoutputmixin import IOMixin
 
 
-class ScaffoldVar(InputObjectMixin):
+class ScaffoldVar(IOMixin):
     def validate(self, value=None, defaults=None):
         if value is not None:
             return value

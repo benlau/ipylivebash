@@ -1,4 +1,4 @@
-from .inputoutputmixin import InputOutputOptions
+from .inputoutputmixin import IOOptions
 from ipylivebash.sessionmanager import run_script
 import asyncio
 
@@ -16,7 +16,7 @@ class Processor:
 
     def process(self, input, output, value, output_widget):
         output_widget.clear_output()
-        options = InputOutputOptions(
+        options = IOOptions(
             source=input,
             shared_storage=self.shared_storage,
             print_line=output_widget.append_stdout,
