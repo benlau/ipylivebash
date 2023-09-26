@@ -34,10 +34,11 @@ class FormLayout(ScaffoldWidget):
         self.title = title
         self.output = ApplyToSource()
         self.processor = Processor()
+        self.widget = self._create_ipywidget()
 
-    def create_ipywidget(self):
+    def _create_ipywidget(self):
         factory = WidgetFactory()
-        output_area = DoubleBufferOutput()
+        output_widget = DoubleBufferOutput()
 
         layout = []
         title_widget = None
@@ -67,8 +68,8 @@ class FormLayout(ScaffoldWidget):
             for i, _ in enumerate(self.input):
                 values.append(grid[i, 1].value)
 
-            self.processor(self.input, self.output, values, output_widget=output_area)
+            self.processor(self.input, self.output, values, output_widget=output_widget)
 
         submit_area = factory.create_submit_area(self.output, on_submit)
-        widgets_box = widgets.VBox(layout + [grid, submit_area, output_area.vbox])
+        widgets_box = widgets.VBox(layout + [grid, submit_area, output_widget.vbox])
         return widgets_box

@@ -15,7 +15,8 @@ class WidgetFactory:
                 value = None
             input_widget = widgets.Select(options=input.defaults, value=value)
         else:
-            input_widget = widgets.Text(value=value)
+            layout = widgets.Layout(width="240px")
+            input_widget = widgets.Text(value=value, layout=layout)
 
         return input_widget
 

@@ -36,9 +36,7 @@ class ColumnFlow:
         return html
 
     def _create_container(self, child):
-        layout = widgets.Layout(
-            min_width="200px",
-        )
+        layout = widgets.Layout(min_width="300px", overflow="none")
         injected = self._create_scroll_to_end_injection()
         container = widgets.VBox([injected, child], layout=layout)
         return container
@@ -47,5 +45,5 @@ class ColumnFlow:
         container = self._create_container(child)
         self.hbox.children = (*self.hbox.children, container)
 
-    def trunc(self, last):
+    def truncate(self, last):
         self.hbox.children = self.hbox.children[0:last]

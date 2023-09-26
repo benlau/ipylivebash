@@ -23,7 +23,7 @@ def preset_iot(func):
     return inner
 
 
-def preset_iot_init(func):
+def preset_iot_class_method(func):
     """
     A decorator that preset the input, output, title arguments
     """

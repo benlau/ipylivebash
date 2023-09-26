@@ -11,7 +11,7 @@ class DoubleBufferOutput:
     def __init__(self):
         self.active = 0
         self.outputs = list(map(lambda i: widgets.Output(), range(2)))
-        self.vbox = widgets.VBox(self.outputs)
+        self.widget = widgets.VBox(self.outputs)
         self.refresh()
 
     def refresh(self):

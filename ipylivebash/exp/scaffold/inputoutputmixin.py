@@ -1,6 +1,7 @@
 from typing import Callable, Optional, List, Union
 from abc import ABC
 from dataclasses import dataclass
+from .interfacebuilder import InterfaceBuilder
 
 
 @dataclass
@@ -16,6 +17,8 @@ class IOOptions:
     shared_storage: Optional[dict] = None
 
     source: Optional[Union[List["InputObject"], "InputObject"]] = None
+
+    interface_builder: Optional[InterfaceBuilder] = None
 
 
 def _normalize_defaults(defaults):
