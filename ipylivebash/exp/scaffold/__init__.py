@@ -7,3 +7,4 @@ from .formlayout import *
 from .singlevaluelayout import *
 from .columnflow import *
 from .scaffold import *
+from .newblock import *

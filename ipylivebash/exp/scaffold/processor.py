@@ -1,6 +1,7 @@
 from .inputoutputmixin import IOOptions
 from ipylivebash.sessionmanager import run_script
 import asyncio
+from inspect import signature
 
 
 class Processor:
@@ -17,7 +18,8 @@ class Processor:
         return self.process(input, output, value)
 
     def process(self, input, output, value):
-        self.output_widget.clear_output()
+        if self.output_widget is not None:
+            self.output_widget.clear_output()
         print_line = (
             self.output_widget.append_stdout if self.output_widget is not None else None
         )
@@ -43,4 +45,8 @@ class Processor:
                 task = run_script(script, print_line=print_line, env=env)
                 asyncio.get_event_loop().create_task(task)
             elif callable(target):
-                target(value, options)
+                sig = signature(target)
+                arg_count = len(sig.parameters)
+
+                args = [value, options][:arg_count]
+                target(*args)

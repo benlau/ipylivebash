@@ -1,7 +1,5 @@
 from ipywidgets import widgets
-from IPython.display import Javascript
 import uuid
-import json
 
 
 class ColumnFlow:

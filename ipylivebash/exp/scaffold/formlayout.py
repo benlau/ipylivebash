@@ -1,5 +1,5 @@
 from typing import List
-from .scaffoldwidget import ScaffoldWidget
+from .scaffoldwidget import ScaffoldWidget, preset_iot_class_method
 import ipywidgets as widgets
 from IPython.display import display
 from .scaffoldvar import ScaffoldVar
@@ -26,14 +26,15 @@ class ApplyToSource(OutputObject):
 
 
 class FormLayout(ScaffoldWidget):
-    def __init__(self, input: List[ScaffoldVar], title="Form"):
+    def __init__(self, input: List[ScaffoldVar], output=None, title="Form"):
         if isinstance(input, list):
             self.input = input
         else:
             self.input = [input]
+        if output is None:
+            output = ApplyToSource()
         self.title = title
-        self.output = ApplyToSource()
-        self.processor = Processor()
+        self.output = output
         self.widget = self._create_ipywidget()
 
     def _create_ipywidget(self):
@@ -68,8 +69,8 @@ class FormLayout(ScaffoldWidget):
             for i, _ in enumerate(self.input):
                 values.append(grid[i, 1].value)
 
-            self.processor(self.input, self.output, values, output_widget=output_widget)
+            self.processor(self.input, self.output, values)
 
         submit_area = factory.create_submit_area(self.output, on_submit)
-        widgets_box = widgets.VBox(layout + [grid, submit_area, output_widget.vbox])
+        widgets_box = widgets.VBox(layout + [grid, submit_area, output_widget.widget])
         return widgets_box
