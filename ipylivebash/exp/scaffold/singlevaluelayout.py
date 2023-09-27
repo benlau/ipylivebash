@@ -15,6 +15,9 @@ class SingleValueLayout(ScaffoldWidget):
         self.processor = Processor()
         self.widget = self._create_ipywidget()
 
+    def focus(self):
+        self.input_widget.focus()
+
     def _create_ipywidget(self):
         layout = []
         factory = WidgetFactory()
@@ -27,6 +30,7 @@ class SingleValueLayout(ScaffoldWidget):
         output_area = DoubleBufferOutput()
 
         input_widget = factory.create_input(self.input)
+        self.input_widget = input_widget
 
         def on_submit():
             self.processor(self.input, self.output, input_widget.value)

@@ -30,7 +30,12 @@ class _ScaffoldInterfaceBuilder(InterfaceBuilder):
             output_widget=self.output_widget,
             shared_storage=self.shared_storage,
         )
+        self.layout = layout
         self.flow.append(layout.widget)
+        self.focus()
+
+    def focus(self):
+        self.layout.focus()
 
 
 class Scaffold(InterfaceBuilder):
@@ -56,3 +61,4 @@ class Scaffold(InterfaceBuilder):
             0, self.shared_storage, flow, output_widget
         )
         _delegate.ask(input, output, title)
+        _delegate.focus()
