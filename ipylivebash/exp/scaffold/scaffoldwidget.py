@@ -5,6 +5,13 @@ from .utils import inspect_arg_name
 from .inputoutputmixin import IOOptions
 
 
+def _setup_iot(input, output, title):
+    if output is None and not isinstance(input, list):
+        output = input
+
+    return (input, output, title)
+
+
 def preset_iot(func):
     """
     A decorator that preset the input, output, title arguments
@@ -16,8 +23,7 @@ def preset_iot(func):
                 title = inspect_arg_name(0, "input")
             elif output is not None:
                 title = inspect_arg_name(1, "output")
-        if output is None:
-            output = input
+        (input, output, title) = _setup_iot(input, output, title)
         return func(input, output, title, *args, **kwargs)
 
     return inner
@@ -34,8 +40,7 @@ def preset_iot_class_method(func):
                 title = inspect_arg_name(0, "input")
             elif output is not None:
                 title = inspect_arg_name(1, "output")
-        if output is None:
-            output = input
+        (input, output, title) = _setup_iot(input, output, title)
         return func(self, input, output, title, *args, **kwargs)
 
     return inner
