@@ -1,4 +1,4 @@
-from ipylivebash.exp.scaffold.scaffoldwidget import preset_iot_class_method
+from ipylivebash.exp.scaffold.preset_iot import preset_iot_class_method
 from .inputoutputmixin import IOOptions, OutputObject
 
 

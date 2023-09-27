@@ -1,5 +1,4 @@
 from typing import List
-from .scaffoldwidget import ScaffoldWidget, preset_iot_class_method
 import ipywidgets as widgets
 from IPython.display import display
 from .scaffoldvar import ScaffoldVar
@@ -25,7 +24,7 @@ class ApplyToSource(OutputObject):
             source.write(value, options)
 
 
-class FormLayout(ScaffoldWidget):
+class FormLayout:
     def __init__(self, input: List[ScaffoldVar], output=None, title="Form"):
         if isinstance(input, list):
             self.input = input

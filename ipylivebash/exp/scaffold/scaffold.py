@@ -1,5 +1,5 @@
 from ipylivebash.exp.scaffold.doublebufferoutput import DoubleBufferOutput
-from ipylivebash.exp.scaffold.scaffoldwidget import preset_iot_class_method
+from ipylivebash.exp.scaffold.preset_iot import preset_iot_class_method
 from .interfacebuilder import InterfaceBuilder
 from .singlevaluelayout import SingleValueLayout
 from .formlayout import FormLayout

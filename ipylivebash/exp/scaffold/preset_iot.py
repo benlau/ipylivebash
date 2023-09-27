@@ -1,8 +1,5 @@
 from ipylivebash.sessionmanager import run_script  # noqa
-import asyncio
-from .doublebufferoutput import DoubleBufferOutput
 from .utils import inspect_arg_name
-from .inputoutputmixin import IOOptions
 
 
 def _setup_iot(input, output, title):
@@ -44,30 +41,3 @@ def preset_iot_class_method(func):
         return func(self, input, output, title, *args, **kwargs)
 
     return inner
-
-
-class ScaffoldWidget:
-    def execute(self, input, output, output_widget: DoubleBufferOutput):
-        if isinstance(output, list):
-            outputs = output
-        else:
-            outputs = [output]
-
-        output_widget.clear_output()
-
-        options = IOOptions(
-            print_line=output_widget.append_stdout,
-        )
-
-        for target in outputs:
-            if isinstance(target, str):
-                script = target
-                env = {
-                    "LB_VALUE": input,
-                }
-                task = run_script(
-                    script, print_line=output_widget.append_stdout, env=env
-                )
-                asyncio.get_event_loop().create_task(task)
-            elif callable(target):
-                target(input, options)
