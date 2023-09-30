@@ -24,13 +24,13 @@ class JsonFileVar(ScaffoldVar):
         if options is not None and options.print_line is not None:
             options.print_line(f"Set {self.key}={value} to {self.filename}\n")
 
-    def read(self):
+    def read(self, options=None):
         content = self._read_json_from_file()
         if content is None:
-            return self.defaults
+            return None
         value = self.patcher.read(content if content is not None else "", self.key)
         if value is None:
-            return self.defaults
+            return None
         return value
 
     def _read_json_from_file(self):

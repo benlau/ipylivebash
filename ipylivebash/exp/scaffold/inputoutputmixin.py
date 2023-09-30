@@ -45,7 +45,7 @@ class InputObject(ABC):
 
     def read(self, options: IOOptions = None) -> Optional[str]:
         """
-        Read raw value
+        Read raw value. If the value is not set, return None
         """
         raise NotImplementedError()
 

@@ -25,11 +25,9 @@ class EnvFileVar(ScaffoldVar):
     def read(self, options=None):
         content = self._read_file_content()
         if content is None:
-            return self.defaults
+            return None
 
         _, value = self.patcher(content, self.key)
-        if value is None:
-            return self.defaults
         return value
 
     def _read_file_content(self):
