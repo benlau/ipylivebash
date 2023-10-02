@@ -167,7 +167,8 @@ class PatchAssignment:
             escaped = text.replace("'", r"\'")
             return f"'{escaped}'"
         elif quote is QuoteType.Double:
-            return json.dumps(text)
-        elif " " in text or '"' in text:
-            return json.dumps(text)
+            escaped = text.replace('"', r"\"")
+            return f'"{escaped}"'
+        elif any(pattern in text for pattern in [" ", "\n", '"']):
+            return self.normalize(text, quote=QuoteType.Double)
         return text

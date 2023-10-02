@@ -161,7 +161,7 @@ def test_assignment_patch_shell_script():
             ),
         ),
         (
-            # Obtaining space
+            # It should add quote if space existed
             textwrap.dedent(
                 """\
                 a=1.1
@@ -173,6 +173,30 @@ def test_assignment_patch_shell_script():
             textwrap.dedent(
                 """\
                 a="3 4"
+                b=2
+                """
+            ),
+        ),
+        (
+            # It should add quote if new line existed
+            textwrap.dedent(
+                """\
+                a=1.1
+                b=2
+                """
+            ),
+            "a",
+            textwrap.dedent(
+                """\
+            3
+            4
+            """
+            ),
+            textwrap.dedent(
+                """\
+                a="3
+                4
+                "
                 b=2
                 """
             ),

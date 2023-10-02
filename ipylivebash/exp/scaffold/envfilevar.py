@@ -1,8 +1,10 @@
 from ..patchers.assign import PatchAssignment
 from .scaffoldvar import ScaffoldVar
+from .decorators import preset_format
 
 
 class EnvFileVar(ScaffoldVar):
+    @preset_format
     def __init__(self, filename, key, defaults=None):
         self.filename = filename
         self.key = key

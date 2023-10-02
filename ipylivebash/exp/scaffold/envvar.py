@@ -1,6 +1,7 @@
 import os
 from .scaffoldvar import ScaffoldVar
 from .inputoutputmixin import IOOptions
+from .decorators import preset_format
 
 
 class EnvVar(ScaffoldVar):
@@ -8,6 +9,7 @@ class EnvVar(ScaffoldVar):
     Wrapper for environment variable
     """
 
+    @preset_format
     def __init__(self, key, defaults=""):
         self.key = key
         self.defaults = defaults

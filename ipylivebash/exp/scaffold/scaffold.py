@@ -1,5 +1,5 @@
 from ipylivebash.exp.scaffold.doublebufferoutput import DoubleBufferOutput
-from ipylivebash.exp.scaffold.preset_iot import preset_iot_class_method
+from ipylivebash.exp.scaffold.decorators import preset_iot_class_method
 from .interfacebuilder import InterfaceBuilder
 from .singlevaluelayout import SingleValueLayout
 from .formlayout import FormLayout
@@ -16,7 +16,6 @@ class _ScaffoldInterfaceBuilder(InterfaceBuilder):
         self.output_widget = output_widget
         self.shared_storage = shared_storage
 
-    @preset_iot_class_method
     def ask(self, input=None, output=None, title=None):
         self.flow.truncate(self.index)
         if isinstance(input, list):
@@ -33,6 +32,15 @@ class _ScaffoldInterfaceBuilder(InterfaceBuilder):
         self.layout = layout
         self.flow.append(layout.widget)
         self.focus()
+
+        return {
+            "input": input,
+            "output": output,
+            "title": title,
+            "layout": layout,
+            "processor": layout.processor,
+            "output_widget": self.output_widget,
+        }
 
     def focus(self):
         self.layout.focus()

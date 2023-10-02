@@ -1,5 +1,5 @@
 from ipylivebash.exp.scaffold.doublebufferoutput import DoubleBufferOutput
-from .preset_iot import preset_iot_class_method
+from .decorators import preset_iot_class_method
 from ipywidgets import widgets
 from .widgetfactory import WidgetFactory
 from .processor import Processor

@@ -32,6 +32,10 @@ def _normalize_defaults(defaults):
 class InputObject(ABC):
     """
     InputObject
+
+    Properties:
+    - defaults
+    - format
     """
 
     def __str__(self):
