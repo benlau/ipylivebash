@@ -2,7 +2,58 @@ from ipywidgets import widgets
 from .inputoutputmixin import InputObject
 
 
+class WidgetWrapper:
+    def __init__(self, widget, container, get_value=None, on_click=None):
+        self.widget = widget
+        self.container = container
+        self.get_value = get_value
+        self.on_click = on_click
+
+    def focus(self):
+        self.widget.focus()
+
+
 class WidgetFactory:
+    def create_link_button(self, description):
+        style = """
+        <style>
+        .ipylivebash-link-button {
+            background: transparent;
+            color: #1976d2;
+            width: auto;
+        }
+
+        .ipylivebash-link-button:hover {
+            background: transparent;
+            border: none;
+            box-shadow: none ! important;
+            opacity: 0.5;
+        }
+
+        .ipylivebash-link-button:active {
+            background: transparent;
+            border: none;
+            box-shadow: none ! important;
+            opacity: 0.7;
+        }
+
+        .ipylivebash-link-button:focus {
+            border: none;
+            box-shadow: none ! important;
+            outline: none ! important;
+        }
+        </style>
+        """
+        style_html = widgets.HTML(style)
+
+        button = widgets.Button(description=description)
+        button.add_class("ipylivebash-link-button")
+        container = widgets.Box([button, style_html])
+
+        return WidgetWrapper(
+            button, container, on_click=lambda callback: button.on_click(callback)
+        )
+
     def create_input(self, input: InputObject):
         value = str(input) if input is not None else None
 
@@ -30,7 +81,9 @@ class WidgetFactory:
             layout = widgets.Layout(width="240px")
             input_widget = widgets.Text(value=value, layout=layout)
 
-        return input_widget
+        return WidgetWrapper(
+            input_widget, input_widget, get_value=lambda: input_widget.value
+        )
 
     def create_submit_area(self, _output, on_submit, default_label="Submit"):
         # TODO - Handle multiple actions

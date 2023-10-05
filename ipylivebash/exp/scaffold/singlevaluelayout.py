@@ -33,14 +33,14 @@ class SingleValueLayout:
         self.input_widget = input_widget
 
         def on_submit():
-            self.processor(self.input, self.output, input_widget.value)
+            self.processor(self.input, self.output, input_widget.get_value())
 
         submit_area = factory.create_submit_area(
             self.output, on_submit=on_submit, default_label=self.action_label
         )
 
         widgets_box = widgets.VBox(
-            layout + [input_widget, submit_area, output_area.widget]
+            layout + [input_widget.container, submit_area, output_area.widget]
         )
 
         return widgets_box

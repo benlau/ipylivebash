@@ -3,7 +3,8 @@ from typing import Optional, Union
 
 
 class FormatType(Enum):
-    Text = "Text"
+    Text = "text"
+    File = "file"
 
 
 class Format:

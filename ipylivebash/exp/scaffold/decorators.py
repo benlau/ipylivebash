@@ -46,7 +46,7 @@ def preset_iot_class_method(func):
 
 def preset_format(func):
     def inner(self, *kargs, **kwargs):
-        keys = ["multiline"]
+        keys = ["multiline", "type"]
 
         format = Format()
 

@@ -5,7 +5,6 @@ from .scaffoldvar import ScaffoldVar
 from .doublebufferoutput import DoubleBufferOutput
 from .widgetfactory import WidgetFactory
 from .inputoutputmixin import OutputObject
-from .processor import Processor
 
 
 class ApplyToSource(OutputObject):
@@ -34,7 +33,7 @@ class FormLayout:
             output = ApplyToSource()
         self.title = title
         self.output = output
-        self.input_widget = None
+        self.input_widgets = []
         self.widget = self._create_ipywidget()
 
     def _create_ipywidget(self):
@@ -62,15 +61,13 @@ class FormLayout:
 
             input_widget = factory.create_input(input)
             grid[i, 0] = label
-            grid[i, 1] = input_widget
-
-            if self.input_widget is None:
-                self.input_widget = input_widget
+            grid[i, 1] = input_widget.container
+            self.input_widgets.append(input_widget)
 
         def on_submit():
             values = []
             for i, _ in enumerate(self.input):
-                values.append(grid[i, 1].value)
+                values.append(self.input_widgets[i].get_value())
 
             self.processor(self.input, self.output, values)
 
@@ -79,4 +76,5 @@ class FormLayout:
         return widgets_box
 
     def focus(self):
-        self.input_widget.focus()
+        if len(self.input_widgets) > 0:
+            self.input_widgets[0].focus()
