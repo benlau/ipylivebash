@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 
 class FormatType(Enum):
@@ -9,7 +9,11 @@ class FormatType(Enum):
 
 class Format:
     def __init__(
-        self, type=FormatType.Text, multiline: Optional[Union[bool, int]] = False
+        self,
+        type=FormatType.Text,
+        multiline: Optional[Union[bool, int]] = False,
+        select: Optional[List[str]] = None,
     ):
         self.type = type
         self.multiline = multiline
+        self.select = select

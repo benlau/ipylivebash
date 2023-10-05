@@ -57,13 +57,9 @@ class WidgetFactory:
     def create_input(self, input: InputObject):
         value = str(input) if input is not None else None
 
-        is_select = (
-            input is not None
-            and isinstance(input.defaults, list)
-            and not isinstance(input.defaults, str)
-        )
-
         format = input.format
+
+        is_select = input is not None and isinstance(format.select, list)
 
         is_textarea = not is_select and (
             format.multiline is True
@@ -71,9 +67,12 @@ class WidgetFactory:
         )
 
         if is_select:
-            if value not in input.defaults:
-                value = None
-            input_widget = widgets.Select(options=input.defaults, value=value)
+            if value not in format.select:
+                if input.defaults in format.select:
+                    value = input.defaults
+                else:
+                    value = None
+            input_widget = widgets.Select(options=format.select, value=value)
         elif is_textarea:
             rows = format.multiline if not isinstance(format.multiline, bool) else 5
             input_widget = widgets.Textarea(value=value, rows=rows)
