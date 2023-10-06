@@ -7,12 +7,12 @@ from .processor import Processor
 
 class SingleValueLayout:
     @preset_iot_class_method
-    def __init__(self, input=None, output=None, title=None):
+    def __init__(self, input=None, output=None, title=None, context=None):
         self.input = input
         self.title = title
         self.output = output
         self.action_label = "Confirm"
-        self.processor = Processor()
+        self.context = context
         self.widget = self._create_ipywidget()
 
     def focus(self):
@@ -33,7 +33,8 @@ class SingleValueLayout:
         self.input_widget = input_widget
 
         def on_submit():
-            self.processor(self.input, self.output, input_widget.get_value())
+            processor = Processor(self.context)
+            processor(self.input, self.output, input_widget.get_value())
 
         submit_area = factory.create_submit_area(
             self.output, on_submit=on_submit, default_label=self.action_label

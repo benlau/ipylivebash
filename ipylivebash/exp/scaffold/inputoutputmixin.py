@@ -1,24 +1,7 @@
 from typing import Callable, Optional, List, Union
 from abc import ABC
 from dataclasses import dataclass
-from .interfacebuilder import InterfaceBuilder
-
-
-@dataclass
-class IOOptions:
-    """
-    That is the options passed for input-output processing function
-    """
-
-    # For reporting the progress
-    print_line: Optional[Callable[[str], None]] = None
-
-    # Shared storage between input and output
-    shared_storage: Optional[dict] = None
-
-    source: Optional[Union[List["InputObject"], "InputObject"]] = None
-
-    interface_builder: Optional[InterfaceBuilder] = None
+from .context import Context
 
 
 def _normalize_defaults(defaults):
@@ -41,13 +24,13 @@ class InputObject(ABC):
     def __str__(self):
         return self.to_string()
 
-    def to_string(self, options: IOOptions = None) -> str:
-        ret = self.read(options=options)
+    def to_string(self, context: Context = None) -> str:
+        ret = self.read(context=context)
         if ret is None and self.defaults is not None:
             ret = _normalize_defaults(self.defaults)
         return ret if ret is not None else ""
 
-    def read(self, options: IOOptions = None) -> Optional[str]:
+    def read(self, context: Context = None) -> Optional[str]:
         """
         Read raw value. If the value is not set, return None
         """
@@ -55,10 +38,10 @@ class InputObject(ABC):
 
 
 class OutputObject(ABC):
-    def __call__(self, value=None, options: IOOptions = None):
-        self.write(value, options=options)
+    def __call__(self, value=None, context: Context = None):
+        self.write(value, context=context)
 
-    def write(self, value=None, options: IOOptions = None):
+    def write(self, value=None, context: Context = None):
         raise NotImplementedError()
 
 

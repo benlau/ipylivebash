@@ -4,33 +4,23 @@ from .interfacebuilder import InterfaceBuilder
 from .singlevaluelayout import SingleValueLayout
 from .formlayout import FormLayout
 from .columnflow import ColumnFlow
-from .processor import Processor
+from .context import Context
 from IPython.display import display, clear_output
 from ipywidgets import widgets
 
 
-class _ScaffoldInterfaceBuilder(InterfaceBuilder):
-    def __init__(self, index, shared_storage, flow, output_widget):
-        self.index = index
-        self.flow = flow
-        self.output_widget = output_widget
-        self.shared_storage = shared_storage
+class Block(InterfaceBuilder):
+    def __init__(self, context):
+        self.context = context
 
     def ask(self, input=None, output=None, title=None):
-        self.flow.truncate(self.index)
+        self.context.column_flow.truncate(self.context.current_block_index)
         if isinstance(input, list):
-            layout = FormLayout(input, output, title)
+            layout = FormLayout(input, output, title, self.context)
         else:
-            layout = SingleValueLayout(input, output, title)
-        layout.processor = Processor(
-            interface_builder=_ScaffoldInterfaceBuilder(
-                self.index + 1, self.shared_storage, self.flow, self.output_widget
-            ),
-            output_widget=self.output_widget,
-            shared_storage=self.shared_storage,
-        )
+            layout = SingleValueLayout(input, output, title, self.context)
         self.layout = layout
-        self.flow.append(layout.widget)
+        self.context.column_flow.append(layout.widget)
         self.focus()
 
         return {
@@ -38,8 +28,6 @@ class _ScaffoldInterfaceBuilder(InterfaceBuilder):
             "output": output,
             "title": title,
             "layout": layout,
-            "processor": layout.processor,
-            "output_widget": self.output_widget,
         }
 
     def focus(self):
@@ -53,20 +41,26 @@ class Scaffold(InterfaceBuilder):
     """
 
     def __init__(self):
-        self.shared_storage = {}
+        pass
 
     @preset_iot_class_method
     def ask(self, input=None, output=None, title=None):
+        shared_storage = {}
         output_widget = DoubleBufferOutput()
+        column_flow = ColumnFlow()
+        vbox = widgets.VBox([column_flow.widget, output_widget.widget])
 
-        flow = ColumnFlow()
-
-        vbox = widgets.VBox([flow.widget, output_widget.widget])
+        context = Context(
+            shared_storage=shared_storage,
+            input=input,
+            output=output,
+            column_flow=column_flow,
+            print_line=output_widget.append_stdout,
+            clear_output=output_widget.clear_output,
+        )
 
         clear_output()
         display(vbox)
-        _delegate = _ScaffoldInterfaceBuilder(
-            0, self.shared_storage, flow, output_widget
-        )
-        _delegate.ask(input, output, title)
-        _delegate.focus()
+        block = Block(context)
+        block.ask(input, output, title)
+        block.focus()

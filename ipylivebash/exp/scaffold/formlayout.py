@@ -1,4 +1,5 @@
 from typing import List
+from ipylivebash.exp.scaffold.processor import Processor
 import ipywidgets as widgets
 from IPython.display import display
 from .scaffoldvar import ScaffoldVar
@@ -8,23 +9,25 @@ from .inputoutputmixin import OutputObject
 
 
 class ApplyToSource(OutputObject):
-    def __call__(self, value, options):
+    def __call__(self, value, context):
         values = []
         sources = []
         if isinstance(value, list):
             values = value
-            sources = options.source
+            sources = context.input
         else:
             values = [value]
-            sources = [options.source]
+            sources = [context.input]
 
         for index, value in enumerate(values):
             source = sources[index]
-            source.write(value, options)
+            source.write(value, context)
 
 
 class FormLayout:
-    def __init__(self, input: List[ScaffoldVar], output=None, title="Form"):
+    def __init__(
+        self, input: List[ScaffoldVar], output=None, title="Form", context=None
+    ):
         if isinstance(input, list):
             self.input = input
         else:
@@ -34,6 +37,7 @@ class FormLayout:
         self.title = title
         self.output = output
         self.input_widgets = []
+        self.context = context
         self.widget = self._create_ipywidget()
 
     def _create_ipywidget(self):
@@ -69,7 +73,8 @@ class FormLayout:
             for i, _ in enumerate(self.input):
                 values.append(self.input_widgets[i].get_value())
 
-            self.processor(self.input, self.output, values)
+            processor = Processor(self.context)
+            processor(self.input, self.output, values)
 
         submit_area = factory.create_submit_area(self.output, on_submit)
         widgets_box = widgets.VBox(layout + [grid, submit_area, output_widget.widget])

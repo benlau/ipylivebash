@@ -18,9 +18,8 @@ class DoubleBufferOutput:
         self.outputs[self.active].layout.visibility = "visible"
         self.outputs[1 - self.active].layout.visibility = "hidden"
 
-    @property
-    def append_stdout(self):
-        return self.outputs[self.active].append_stdout
+    def append_stdout(self, message):
+        self.outputs[self.active].append_stdout(message)
 
     def clear_output(self):
         self.outputs[self.active].clear_output()

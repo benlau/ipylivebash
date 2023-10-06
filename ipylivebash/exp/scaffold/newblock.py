@@ -1,5 +1,7 @@
 from ipylivebash.exp.scaffold.decorators import preset_iot_class_method
-from .inputoutputmixin import IOOptions, OutputObject
+from .context import Context
+from .inputoutputmixin import OutputObject
+from .scaffold import Block
 
 
 class NewBlock(OutputObject):
@@ -14,13 +16,15 @@ class NewBlock(OutputObject):
         self.output = output
         self.title = title
 
-    def write(self, value=None, options: IOOptions = None):
-        if options is None:
+    def write(self, value=None, context: Context = None):
+        if context is None:
             return
 
-        if options.interface_builder is None:
+        if context.interface_builder is None:
             return
 
-        options.interface_builder.ask(
-            input=self.input, output=self.output, title=self.title
-        )
+        next_content = context.create_next_context(input=self.input, output=self.output)
+
+        block = Block(next_content)
+        block.ask(input=self.input, output=self.output, title=self.title)
+        block.focus()

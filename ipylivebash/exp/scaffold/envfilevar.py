@@ -11,7 +11,7 @@ class EnvFileVar(ScaffoldVar):
         self.patcher = PatchAssignment()
         self.defaults = defaults
 
-    def write(self, value, options=None):
+    def write(self, value, context=None):
         content = self._read_file_content()
         replaced, _ = self.patcher(
             content if content is not None else "", self.key, value
@@ -21,10 +21,10 @@ class EnvFileVar(ScaffoldVar):
         file.write(replaced)
         file.close()
 
-        if options is not None and options.print_line is not None:
-            options.print_line(f"Set {self.key}={value} to {self.filename}\n")
+        if context is not None and context.print_line is not None:
+            context.print_line(f"Set {self.key}={value} to {self.filename}\n")
 
-    def read(self, options=None):
+    def read(self, context=None):
         content = self._read_file_content()
         if content is None:
             return None

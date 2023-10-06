@@ -1,6 +1,6 @@
 import os
 from .scaffoldvar import ScaffoldVar
-from .inputoutputmixin import IOOptions
+from .context import Context
 from .decorators import preset_format
 
 
@@ -14,11 +14,11 @@ class EnvVar(ScaffoldVar):
         self.key = key
         self.defaults = defaults
 
-    def write(self, value=None, options: IOOptions = None):
+    def write(self, value=None, context: Context = None):
         validaed_value = self.validate(value, self.defaults)
         os.environ[self.key] = validaed_value
-        if options is not None and options.print_line is not None:
-            options.print_line(f"Set {self.key}={value}\n")
+        if context is not None and context.print_line is not None:
+            context.print_line(f"Set {self.key}={value}\n")
 
-    def read(self, options: IOOptions = None):
+    def read(self, context: Context = None):
         return os.getenv(self.key)
