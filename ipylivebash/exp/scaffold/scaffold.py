@@ -1,37 +1,11 @@
 from ipylivebash.exp.scaffold.doublebufferoutput import DoubleBufferOutput
 from ipylivebash.exp.scaffold.decorators import preset_iot_class_method
 from .interfacebuilder import InterfaceBuilder
-from .singlevaluelayout import SingleValueLayout
-from .formlayout import FormLayout
 from .columnflow import ColumnFlow
 from .context import Context
 from IPython.display import display, clear_output
 from ipywidgets import widgets
-
-
-class Block(InterfaceBuilder):
-    def __init__(self, context):
-        self.context = context
-
-    def ask(self, input=None, output=None, title=None):
-        self.context.column_flow.truncate(self.context.current_block_index)
-        if isinstance(input, list):
-            layout = FormLayout(input, output, title, self.context)
-        else:
-            layout = SingleValueLayout(input, output, title, self.context)
-        self.layout = layout
-        self.context.column_flow.append(layout.widget)
-        self.focus()
-
-        return {
-            "input": input,
-            "output": output,
-            "title": title,
-            "layout": layout,
-        }
-
-    def focus(self):
-        self.layout.focus()
+from .block import Block
 
 
 class Scaffold(InterfaceBuilder):
