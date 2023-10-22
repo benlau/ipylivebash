@@ -36,6 +36,9 @@ class InputObject(ABC):
         """
         raise NotImplementedError()
 
+    def get_id(self):
+        raise NotImplementedError()
+
 
 class OutputObject(ABC):
     def __call__(self, value=None, context: Context = None):

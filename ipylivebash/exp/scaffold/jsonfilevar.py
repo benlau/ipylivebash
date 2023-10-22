@@ -14,6 +14,9 @@ class JsonFileVar(ScaffoldVar):
         self.defaults = defaults
         self.indent = indent
 
+    def get_id(self):
+        return f"JsonFile:{self.filename}:{self.key}"
+
     def write(self, value, context=None):
         content = self._read_json_from_file()
         if content is None:

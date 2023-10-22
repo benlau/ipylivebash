@@ -2,6 +2,11 @@ from ..exp.scaffold.envfilevar import EnvFileVar
 from tempfile import NamedTemporaryFile
 
 
+def test_envfilevar_get_id():
+    variable = EnvFileVar("./config.env", "A")
+    assert variable.get_id() == "EnvFile:./config.env:A"
+
+
 def test_envfile_var_read_not_existed_file():
     var = EnvFileVar("not_existed_file", "var", "default")
     assert var.read() == None

@@ -23,7 +23,7 @@ class Block(InterfaceBuilder):
             "title": title,
             "layout": layout,
         }
-    
+
     def display(self, widget):
         self.context.column_flow.append(widget)
 

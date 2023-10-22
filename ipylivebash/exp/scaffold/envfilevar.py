@@ -11,6 +11,9 @@ class EnvFileVar(ScaffoldVar):
         self.patcher = PatchAssignment()
         self.defaults = defaults
 
+    def get_id(self):
+        return f"EnvFile:{self.filename}:{self.key}"
+
     def write(self, value, context=None):
         content = self._read_file_content()
         replaced, _ = self.patcher(

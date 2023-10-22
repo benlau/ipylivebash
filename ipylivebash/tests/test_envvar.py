@@ -2,6 +2,12 @@ from ..exp.scaffold.envvar import EnvVar
 import os
 
 
+def test_envvar_get_id():
+    var = EnvVar("VALUE_NOT_EXISTED")
+
+    assert var.get_id() == "Env:VALUE_NOT_EXISTED"
+
+
 def test_envvar_defaults_is_array():
     var = EnvVar("VALUE_NOT_EXISTED", ["V1", "V2"])
 

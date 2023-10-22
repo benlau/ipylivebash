@@ -14,6 +14,9 @@ class EnvVar(ScaffoldVar):
         self.key = key
         self.defaults = defaults
 
+    def get_id(self):
+        return f"Env:{self.key}"
+
     def write(self, value=None, context: Context = None):
         validaed_value = self.validate(value, self.defaults)
         os.environ[self.key] = validaed_value
