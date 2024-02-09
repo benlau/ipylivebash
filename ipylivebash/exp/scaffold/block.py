@@ -8,13 +8,13 @@ class Block(InterfaceBuilder):
         self.context = context
 
     def ask(self, input=None, output=None, title=None):
-        self.context.column_flow.truncate(self.context.current_block_index)
+        self.context.main_layout.truncate(self.context.current_block_index)
         if isinstance(input, list):
             layout = FormLayout(input, output, title, self.context)
         else:
             layout = SingleValueLayout(input, output, title, self.context)
         self.layout = layout
-        self.context.column_flow.append(layout.widget)
+        self.context.main_layout.append(layout.widget)
         self.focus()
 
         return {
@@ -25,7 +25,7 @@ class Block(InterfaceBuilder):
         }
 
     def display(self, widget):
-        self.context.column_flow.append(widget)
+        self.context.main_layout.append(widget)
 
     def focus(self):
         if self.layout is not None:

@@ -1,0 +1,1 @@
+from .configpanel import ConfigPanel

@@ -8,7 +8,7 @@ class Context(InterfaceBuilder):
         shared_storage=None,
         input=None,
         output=None,
-        column_flow=None,
+        main_layout=None,
         print_line=None,
         clear_output=None,
     ):
@@ -17,7 +17,7 @@ class Context(InterfaceBuilder):
         self.shared_storage = shared_storage
         self.input = input
         self.output = output
-        self.column_flow = column_flow
+        self.main_layout = main_layout
 
         # For reporting the progress
         self.print_line = print_line
@@ -37,7 +37,7 @@ class Context(InterfaceBuilder):
             shared_storage=self.shared_storage,
             input=input,
             output=output,
-            column_flow=self.column_flow,
+            main_layout=self.main_layout,
             print_line=self.print_line,
             clear_output=self.clear_output,
         )

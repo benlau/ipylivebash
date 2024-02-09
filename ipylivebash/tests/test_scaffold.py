@@ -7,7 +7,7 @@ from ipylivebash.exp.scaffold.context import Context
 
 def test_scaffold_form_layout():
     context = Context(
-        column_flow=Mock(),
+        main_layout=Mock(),
         print_line=Mock(),
         clear_output=Mock(),
     )

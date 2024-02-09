@@ -21,14 +21,14 @@ class Scaffold(InterfaceBuilder):
     def ask(self, input=None, output=None, title=None):
         shared_storage = {}
         output_widget = DoubleBufferOutput()
-        column_flow = ColumnFlow()
-        vbox = widgets.VBox([column_flow.widget, output_widget.widget])
+        main_layout = ColumnFlow()
+        vbox = widgets.VBox([main_layout.widget, output_widget.widget])
 
         context = Context(
             shared_storage=shared_storage,
             input=input,
             output=output,
-            column_flow=column_flow,
+            main_layout=main_layout,
             print_line=output_widget.append_stdout,
             clear_output=output_widget.clear_output,
         )
