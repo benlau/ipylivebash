@@ -6,7 +6,7 @@ from inspect import signature
 
 class Processor:
     """
-    Process output(s) from input(s) and instance value(s)
+    Run output(s) from input(s) and instance value(s)
     """
 
     def __init__(self, context=None):

@@ -1,5 +1,5 @@
-from .formlayout import FormLayout
-from .singlevaluelayout import SingleValueLayout
+from .layout.formlayout import FormLayout
+from .layout.singlevaluelayout import SingleValueLayout
 from .interfacebuilder import InterfaceBuilder
 
 

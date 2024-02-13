@@ -2,10 +2,10 @@ from typing import List
 from ipylivebash.exp.scaffold.processor import Processor
 import ipywidgets as widgets
 from IPython.display import display
-from .scaffoldvar import ScaffoldVar
-from .doublebufferoutput import DoubleBufferOutput
-from .widgetfactory import WidgetFactory
-from .inputoutputmixin import OutputObject
+from ..scaffoldvar import ScaffoldVar
+from ..doublebufferoutput import DoubleBufferOutput
+from ..widgetfactory import WidgetFactory
+from ..inputoutputmixin import OutputObject
 
 
 class ApplyToSource(OutputObject):
@@ -24,9 +24,19 @@ class ApplyToSource(OutputObject):
             source.write(value, context)
 
 
+# FormLayout is a class that creates a layout for a form.
+# TODO:
+# - Add support for debouncer
+
+
 class FormLayout:
     def __init__(
-        self, input: List[ScaffoldVar], output=None, title="Form", context=None
+        self,
+        input: List[ScaffoldVar],
+        output=None,
+        title="Form",
+        context=None,
+        instant_write=False,
     ):
         if isinstance(input, list):
             self.input = input
@@ -38,6 +48,7 @@ class FormLayout:
         self.output = output
         self.input_widgets = []
         self.context = context
+        self.instant_write = instant_write
         self.widget = self._create_ipywidget()
 
     def _create_ipywidget(self):
@@ -76,8 +87,20 @@ class FormLayout:
             processor = Processor(self.context)
             processor(self.input, self.output, values)
 
-        submit_area = factory.create_submit_area(self.output, on_submit)
-        widgets_box = widgets.VBox(layout + [grid, submit_area, output_widget.widget])
+        if self.instant_write is False:
+            submit_area = factory.create_submit_area(self.output, on_submit)
+            widgets_box = widgets.VBox(
+                layout + [grid, submit_area, output_widget.widget]
+            )
+        else:
+            for widget in self.input_widgets:
+
+                def on_change(change):
+                    if change["type"] == "change" and change["name"] == "value":
+                        on_submit()
+
+                widget.widget.observe(on_change)
+            widgets_box = widgets.VBox(layout + [grid, output_widget.widget])
         return widgets_box
 
     def focus(self):
