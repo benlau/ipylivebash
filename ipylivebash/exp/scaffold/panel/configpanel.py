@@ -15,7 +15,7 @@ class ConfigPanel:
         input=None,
         output=None,
         title=None,
-        log_view=None,
+        logger=None,
         context=None,
         instant_write=False,
     ):
@@ -24,7 +24,7 @@ class ConfigPanel:
         self.title = title
         self.widget = None
         self.context = context
-        self.log_view = log_view
+        self.logger = logger
         self.instant_write = instant_write
         self.is_setup_completed = False
 
@@ -32,15 +32,15 @@ class ConfigPanel:
         if self.is_setup_completed:
             return
 
-        if self.log_view is None:
-            self.log_view = Logger()
+        if self.logger is None:
+            self.logger = Logger()
 
         if self.context is None:
             self.context = Context(
                 input=self.input,
                 output=self.output,
-                print_line=self.log_view.append_stdout,
-                clear_output=self.log_view.clear_output,
+                print_line=self.logger.append_stdout,
+                clear_output=self.logger.clear_output,
             )
 
         input = self.input
@@ -49,7 +49,11 @@ class ConfigPanel:
 
         if isinstance(input, list):
             layout = FormLayout(
-                input, output, title, self.context, instant_write=self.instant_write
+                input,
+                output,
+                title,
+                context=self.context,
+                instant_write=self.instant_write,
             )
         else:
             layout = SingleValueLayout(
@@ -61,7 +65,7 @@ class ConfigPanel:
             )
         self.layout = layout
 
-        self.widget = widgets.VBox([self.layout.widget, self.log_view.widget])
+        self.widget = widgets.VBox([self.layout.widget, self.logger.widget])
 
         self.focus()
         self.is_setup_completed = True

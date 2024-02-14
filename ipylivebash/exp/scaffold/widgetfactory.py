@@ -92,4 +92,5 @@ class WidgetFactory:
             on_submit()
 
         submit_button.on_click(button_callback)
-        return submit_button
+
+        return (submit_button, submit_button)  # hbox, confirm_button

@@ -11,6 +11,7 @@ class Context(InterfaceBuilder):
         main_layout=None,
         print_line=None,
         clear_output=None,
+        processor=None,
     ):
         self.current_block_index = current_block_index
         # Shared storage between input and output
@@ -21,7 +22,7 @@ class Context(InterfaceBuilder):
 
         # For reporting the progress
         self.print_line = print_line
-
+        self.processor = processor
         self._clear_output = clear_output
 
     def clear_output(self):

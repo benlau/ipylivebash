@@ -49,6 +49,7 @@ class FormLayout:
         self.input_widgets = []
         self.context = context
         self.instant_write = instant_write
+        self.confirm_button = None
         self.widget = self._create_ipywidget()
 
     def _create_ipywidget(self):
@@ -80,15 +81,25 @@ class FormLayout:
             self.input_widgets.append(input_widget)
 
         def on_submit():
+            def enable():
+                if self.confirm_button is not None:
+                    self.confirm_button.disabled = False
+
             values = []
             for i, _ in enumerate(self.input):
                 values.append(self.input_widgets[i].get_value())
 
+            if self.confirm_button is not None:
+                self.confirm_button.disabled = True
             processor = Processor(self.context)
-            processor(self.input, self.output, values)
+            task = processor.create_task(self.input, self.output, values)
+            task.add_done_callback(lambda _: enable())
 
         if self.instant_write is False:
-            submit_area = factory.create_submit_area(self.output, on_submit)
+            (submit_area, confirm_button) = factory.create_submit_area(
+                self.output, on_submit
+            )
+            self.confirm_button = confirm_button
             widgets_box = widgets.VBox(
                 layout + [grid, submit_area, output_widget.widget]
             )

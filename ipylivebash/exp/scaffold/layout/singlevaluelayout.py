@@ -10,7 +10,12 @@ from ..processor import Processor
 class SingleValueLayout:
     @preset_iot_class_method
     def __init__(
-        self, input=None, output=None, title=None, context=None, instant_write=False
+        self,
+        input=None,
+        output=None,
+        title=None,
+        context=None,
+        instant_write=False,
     ):
         self.input = input
         self.title = title
@@ -18,7 +23,9 @@ class SingleValueLayout:
         self.action_label = "Confirm"
         self.context = context
         self.instant_write = instant_write
+        self.confirm_button = None
         self.widget = self._create_ipywidget()
+        self.is_running = False
 
     def focus(self):
         self.input_widget.focus()
@@ -29,25 +36,32 @@ class SingleValueLayout:
 
         title_widget = None
         if self.title is not None:
+            # TODO: Update title style
             title_widget = widgets.Label(value=self.title)
             layout.append(title_widget)
-
-        output_area = DoubleBufferOutput()
 
         input_widget = factory.create_input(self.input)
         self.input_widget = input_widget
 
         def on_submit():
-            processor = Processor(self.context)
-            processor(self.input, self.output, input_widget.get_value())
+            def enable():
+                if self.confirm_button is not None:
+                    self.confirm_button.disabled = False
 
-        if self.instant_write is False:
-            submit_area = factory.create_submit_area(
+            processor = Processor(self.context)
+            if self.confirm_button is not None:
+                self.confirm_button.disabled = True
+            task = processor.create_task(
+                self.input, self.output, input_widget.get_value()
+            )
+            task.add_done_callback(lambda _: enable())
+
+        if self.instant_write == False:
+            (submit_area, confirm_button) = factory.create_submit_area(
                 self.output, on_submit=on_submit, default_label=self.action_label
             )
-            widgets_box = widgets.VBox(
-                layout + [input_widget.container, submit_area, output_area.widget]
-            )
+            self.confirm_button = confirm_button
+            widgets_box = widgets.VBox(layout + [input_widget.container, submit_area])
         else:
 
             def on_change(change):
@@ -55,8 +69,6 @@ class SingleValueLayout:
                     on_submit()
 
             self.input_widget.widget.observe(on_change)
-            widgets_box = widgets.VBox(
-                layout + [input_widget.container, output_area.widget]
-            )
+            widgets_box = widgets.VBox(layout + [input_widget.container])
 
         return widgets_box

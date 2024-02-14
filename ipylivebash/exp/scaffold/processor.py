@@ -38,3 +38,9 @@ class Processor:
 
                 args = [value, self.context][:arg_count]
                 target(*args)
+
+    def create_task(self, input, output, value):
+        async def run():
+            return self.process(input, output, value)
+
+        return asyncio.get_event_loop().create_task(run())
