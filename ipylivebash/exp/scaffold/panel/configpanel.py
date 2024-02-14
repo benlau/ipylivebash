@@ -4,6 +4,7 @@ from ipylivebash.exp.scaffold.layout.singlevaluelayout import SingleValueLayout
 from ipylivebash.exp.scaffold.layout.formlayout import FormLayout
 from ipylivebash.exp.scaffold.decorators import preset_iot_class_method
 from IPython.display import display
+from ipylivebash.exp.scaffold.views.logger import Logger
 from ipywidgets import widgets
 
 
@@ -22,8 +23,8 @@ class ConfigPanel:
         self.output = output
         self.title = title
         self.widget = None
-        self.context = None
-        self.log_view = None
+        self.context = context
+        self.log_view = log_view
         self.instant_write = instant_write
         self.is_setup_completed = False
 
@@ -32,7 +33,7 @@ class ConfigPanel:
             return
 
         if self.log_view is None:
-            self.log_view = DoubleBufferOutput()
+            self.log_view = Logger()
 
         if self.context is None:
             self.context = Context(

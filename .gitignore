@@ -157,3 +157,4 @@ ipylivebash/labextension
 examples/log*.txt
 
 src/webcomp.ts
+playground/*.ipynb
