@@ -5,10 +5,10 @@ from IPython.display import display
 from ..scaffoldvar import ScaffoldVar
 from ..doublebufferoutput import DoubleBufferOutput
 from ..widgetfactory import WidgetFactory
-from ..inputoutputmixin import OutputObject
+from ..iounit.iounit import OutputUnit
 
 
-class ApplyToSource(OutputObject):
+class ApplyToSource(OutputUnit):
     def __call__(self, value, context):
         values = []
         sources = []

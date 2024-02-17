@@ -1,7 +1,7 @@
 from typing import Callable, Optional, List, Union
 from abc import ABC
 from dataclasses import dataclass
-from .context import Context
+from ..context import Context
 
 
 def _normalize_defaults(defaults):
@@ -12,9 +12,9 @@ def _normalize_defaults(defaults):
     return ret
 
 
-class InputObject(ABC):
+class InputUnit(ABC):
     """
-    InputObject
+    InputUnit
 
     Properties:
     - defaults
@@ -40,7 +40,7 @@ class InputObject(ABC):
         raise NotImplementedError()
 
 
-class OutputObject(ABC):
+class OutputUnit(ABC):
     def __call__(self, value=None, context: Context = None):
         self.write(value, context=context)
 
@@ -48,7 +48,7 @@ class OutputObject(ABC):
         raise NotImplementedError()
 
 
-class IOMixin(InputObject, OutputObject):
+class IOUnit(InputUnit, OutputUnit):
     def if_none_write_default(self):
         """
         If the current value is none, read the value.

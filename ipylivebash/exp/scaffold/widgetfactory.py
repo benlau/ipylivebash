@@ -1,5 +1,5 @@
 from ipywidgets import widgets
-from .inputoutputmixin import InputObject
+from .iounit.iounit import InputUnit
 
 
 class WidgetWrapper:
@@ -54,7 +54,7 @@ class WidgetFactory:
             button, container, on_click=lambda callback: button.on_click(callback)
         )
 
-    def create_input(self, input: InputObject):
+    def create_input(self, input: InputUnit):
         value = str(input) if input is not None else None
 
         format = input.format

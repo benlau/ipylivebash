@@ -1,12 +1,12 @@
 from ipylivebash.exp.scaffold.decorators import preset_iot_class_method
 from .context import Context
-from .inputoutputmixin import OutputObject
+from .iounit.iounit import OutputUnit
 from .block import Block
 
 
-class NextBlock(OutputObject):
+class NextBlock(OutputUnit):
     """
-    NewBlock is a OutputObject for create a new unit
+    NewBlock is a OutputUnit for create a new unit
     in Scaffold application
     """
 
