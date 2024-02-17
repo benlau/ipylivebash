@@ -1,4 +1,7 @@
-from ipylivebash.exp.scaffold.doublebufferoutput import DoubleBufferOutput
+from ipylivebash.exp.scaffold.services.changedispatcher import (
+    change_dispatcher,
+    Listener,
+)
 from ..decorators import preset_iot_class_method
 from ipywidgets import widgets
 from ..widgetfactory import WidgetFactory
@@ -42,6 +45,17 @@ class SingleValueLayout:
 
         input_widget = factory.create_input(self.input)
         self.input_widget = input_widget
+
+        def on_change(value):
+            try:
+                if self.input_widget.get_value() != value:
+                    self.input_widget.set_value(value)
+            except Exception as e:
+                self.context.print_line(str(e))
+                raise e
+
+        listener = Listener(self.input.get_id(), on_change)
+        change_dispatcher.add_listener(listener)
 
         def on_submit():
             def enable():

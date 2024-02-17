@@ -3,10 +3,13 @@ from .iounit.iounit import InputUnit
 
 
 class WidgetWrapper:
-    def __init__(self, widget, container, get_value=None, on_click=None):
+    def __init__(
+        self, widget, container, get_value=None, on_click=None, set_value=None
+    ):
         self.widget = widget
         self.container = container
         self.get_value = get_value
+        self.set_value = set_value
         self.on_click = on_click
 
     def focus(self):
@@ -80,8 +83,14 @@ class WidgetFactory:
             layout = widgets.Layout(width="240px")
             input_widget = widgets.Text(value=value, layout=layout)
 
+        def set_value(value):
+            input_widget.value = value
+
         return WidgetWrapper(
-            input_widget, input_widget, get_value=lambda: input_widget.value
+            input_widget,
+            input_widget,
+            get_value=lambda: input_widget.value,
+            set_value=set_value,
         )
 
     def create_submit_area(self, _output, on_submit, default_label="Submit"):

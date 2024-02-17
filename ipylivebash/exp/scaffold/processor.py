@@ -1,7 +1,8 @@
-from .context import Context
+from ipylivebash.exp.scaffold.iounit.iounit import InputUnit
 from ipylivebash.sessionmanager import run_script
 import asyncio
 from inspect import signature
+from ipylivebash.exp.scaffold.services.changedispatcher import change_dispatcher
 
 
 class Processor:
@@ -38,6 +39,10 @@ class Processor:
 
                 args = [value, self.context][:arg_count]
                 target(*args)
+
+                if isinstance(target, InputUnit):
+                    object_id = target.get_id()
+                    change_dispatcher.dispatch(object_id, value)
 
     def create_task(self, input, output, value):
         async def run():

@@ -1,11 +1,15 @@
 from typing import List
 from ipylivebash.exp.scaffold.processor import Processor
+from ipylivebash.exp.scaffold.services.changedispatcher import (
+    Listener,
+    change_dispatcher,
+)
 import ipywidgets as widgets
 from IPython.display import display
 from ..scaffoldvar import ScaffoldVar
 from ..doublebufferoutput import DoubleBufferOutput
 from ..widgetfactory import WidgetFactory
-from ..iounit.iounit import OutputUnit
+from ..iounit.iounit import InputUnit, OutputUnit
 
 
 class ApplyToSource(OutputUnit):
@@ -22,6 +26,9 @@ class ApplyToSource(OutputUnit):
         for index, value in enumerate(values):
             source = sources[index]
             source.write(value, context)
+            if isinstance(source, InputUnit):
+                object_id = source.get_id()
+                change_dispatcher.dispatch(object_id, value)
 
 
 # FormLayout is a class that creates a layout for a form.
@@ -69,6 +76,18 @@ class FormLayout:
         )
         grid._grid_template_rows = "auto"
 
+        def create_listener(id, widget):
+            def on_change(value):
+                try:
+                    if widget.get_value() != value:
+                        widget.set_value(value)
+                except Exception as e:
+                    self.context.print_line(str(e))
+                    raise e
+
+            listener = Listener(id, on_change)
+            return listener
+
         for i, input in enumerate(self.input):
             label = widgets.Label(
                 value=input.key, layout=widgets.Layout(margin_right="20px")
@@ -79,6 +98,8 @@ class FormLayout:
             grid[i, 0] = label
             grid[i, 1] = input_widget.container
             self.input_widgets.append(input_widget)
+            listener = create_listener(input.get_id(), input_widget)
+            change_dispatcher.add_listener(listener)
 
         def on_submit():
             def enable():
